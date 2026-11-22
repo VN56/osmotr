@@ -1,0 +1,3029 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>ЭкспертОсмотр 755-П v2.1 (Автономный)</title>
+<style>
+:root {
+  --bg: #0b1120;
+  --surface: #131c31;
+  --surface-2: #1c2842;
+  --border: #2a3958;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --primary: #3b82f6;
+  --primary-dark: #2563eb;
+  --success: #10b981;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --purple: #a855f7;
+  --radius: 14px;
+  --nav-h: 66px;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+  font-size: 15px;
+  line-height: 1.4;
+  overscroll-behavior-y: contain;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; border: none; background: none; }
+
+/* Header */
+.topbar {
+  position: sticky; top: 0; z-index: 40;
+  background: rgba(11, 17, 32, 0.94);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 14px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.brand-badge {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 12px; color: #fff; flex-shrink: 0;
+  letter-spacing: -0.5px;
+}
+.brand-title { font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.brand-sub { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.status-pill {
+  font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 999px;
+  background: rgba(16, 185, 129, 0.15); color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3); white-space: nowrap; flex-shrink: 0;
+}
+
+/* Main container */
+.app-main {
+  max-width: 760px; margin: 0 auto;
+  padding: 14px 12px calc(var(--nav-h) + 28px);
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Cards */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px; margin-bottom: 12px;
+}
+.card.editing-card {
+  border-color: var(--warn);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
+}
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin-bottom: 12px; flex-wrap: wrap;
+}
+.card-title { font-size: 15px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 7px; }
+.section-hint { font-size: 12.5px; color: var(--muted); margin: -4px 0 12px; }
+
+/* Form controls */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+@media (max-width: 440px) {
+  .grid-2.stack-sm { grid-template-columns: 1fr; }
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+}
+.field { margin-bottom: 10px; }
+.field:last-child { margin-bottom: 0; }
+.field label {
+  display: flex; justify-content: space-between; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px;
+}
+.input, select.input, textarea.input {
+  width: 100%; background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px; color: var(--text); font-size: 15px;
+  outline: none; transition: border-color .15s, box-shadow .15s;
+}
+.input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+textarea.input { min-height: 76px; resize: vertical; }
+.input-row { display: flex; gap: 8px; align-items: stretch; }
+.input-row .input { flex: 1; min-width: 0; }
+.vin-valid { border-color: var(--success) !important; }
+.vin-invalid { border-color: var(--danger) !important; }
+
+/* Badges */
+.badge {
+  display: inline-flex; align-items: center; padding: 2px 7px;
+  border-radius: 6px; font-size: 11px; font-weight: 700;
+}
+.badge-ok { background: rgba(16,185,129,.18); color: #34d399; }
+.badge-warn { background: rgba(245,158,11,.18); color: #fbbf24; }
+.badge-err { background: rgba(239,68,68,.18); color: #f87171; }
+.badge-info { background: rgba(59,130,246,.2); color: #60a5fa; }
+.badge-purple { background: rgba(168,85,247,.2); color: #d8b4fe; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 11px 14px; border-radius: 10px; font-weight: 600; font-size: 14px;
+  transition: transform .08s, opacity .15s, background .15s;
+  text-align: center; user-select: none;
+}
+.btn:active { transform: scale(0.98); }
+.btn-full { width: 100%; }
+.btn-sm { padding: 7px 10px; font-size: 12.5px; border-radius: 8px; }
+.btn-xs { padding: 4px 8px; font-size: 11.5px; border-radius: 7px; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-success { background: var(--success); color: #052e16; font-weight: 700; }
+.btn-secondary { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+.btn-danger { background: rgba(239, 68, 68, 0.16); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.35); }
+.btn-warn { background: rgba(245, 158, 11, 0.16); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-row > .btn { flex: 1; min-width: 110px; }
+
+/* Chips & Segments */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  padding: 7px 10px; border-radius: 8px; font-size: 12.5px; font-weight: 600;
+  background: var(--surface-2); border: 1px solid var(--border); color: var(--muted);
+  transition: all .12s;
+}
+.chip.active { background: rgba(59, 130, 246, 0.22); border-color: var(--primary); color: #93c5fd; }
+.chip.code-chip.active { background: rgba(16, 185, 129, 0.2); border-color: var(--success); color: #6ee7b7; }
+.chip.rel-dtp.active { background: rgba(16, 185, 129, 0.2); border-color: var(--success); color: #6ee7b7; }
+.chip.rel-pre.active { background: rgba(245, 158, 11, 0.22); border-color: var(--warn); color: #fcd34d; }
+.chip.rel-old.active { background: rgba(168, 85, 247, 0.22); border-color: var(--purple); color: #d8b4fe; }
+.chip.phrase-chip {
+  padding: 5px 9px; font-size: 12px; font-weight: 500;
+  background: rgba(59, 130, 246, 0.09); border-color: rgba(59, 130, 246, 0.28); color: #cbd5e1;
+}
+.chip.phrase-chip:active { background: rgba(59, 130, 246, 0.28); color: #fff; }
+.chip.lkp-chip { padding: 5px 8px; font-size: 11.5px; }
+
+/* Subtabs inside schema */
+.subtabs {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+  margin-bottom: 10px;
+}
+.subtab-btn {
+  padding: 8px 4px; border-radius: 9px; font-size: 12px; font-weight: 700;
+  background: var(--surface-2); border: 1px solid var(--border); color: var(--muted);
+  text-align: center;
+}
+.subtab-btn.active {
+  background: rgba(59, 130, 246, 0.24); border-color: var(--primary); color: #93c5fd;
+}
+.zone-panel { display: none; }
+.zone-panel.active { display: block; }
+
+/* Part grid for underhood/salon/tires */
+.parts-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 7px;
+}
+.part-btn {
+  padding: 9px 8px; border-radius: 9px; font-size: 12.5px; font-weight: 600;
+  background: #0d1526; border: 1px solid var(--border); color: #cbd5e1;
+  text-align: left; transition: all .12s;
+  display: flex; align-items: center; justify-content: space-between; gap: 4px;
+}
+.part-btn.selected {
+  background: rgba(59, 130, 246, 0.3); border-color: #60a5fa; color: #fff;
+}
+.part-btn.damaged {
+  background: rgba(239, 68, 68, 0.22); border-color: #f87171; color: #fecaca;
+}
+.part-btn.damaged.selected {
+  background: rgba(245, 158, 11, 0.3); border-color: #fbbf24; color: #fff;
+}
+
+/* Progress bar */
+.progress-wrap { background: var(--surface-2); height: 8px; border-radius: 999px; overflow: hidden; margin: 8px 0 4px; }
+.progress-bar { height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); width: 0%; transition: width .25s ease; }
+
+/* Photo Grid */
+.photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.photo-slot {
+  background: var(--surface-2); border: 1px dashed var(--border); border-radius: 12px;
+  overflow: hidden; display: flex; flex-direction: column; position: relative;
+}
+.photo-slot.filled { border-style: solid; border-color: rgba(16, 185, 129, 0.55); }
+.photo-thumb {
+  aspect-ratio: 4 / 3; width: 100%; background: #0d1526;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; color: var(--muted); font-size: 12px; position: relative; overflow: hidden; cursor: pointer;
+}
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-num {
+  position: absolute; top: 6px; left: 6px;
+  background: rgba(11, 17, 32, 0.82); color: #fff;
+  font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 6px;
+}
+.photo-edit-pill {
+  position: absolute; bottom: 6px; right: 6px;
+  background: rgba(37, 99, 235, 0.9); color: #fff;
+  font-size: 10.5px; font-weight: 700; padding: 2px 6px; border-radius: 6px;
+}
+.photo-del {
+  position: absolute; top: 6px; right: 6px;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(239, 68, 68, 0.9); color: #fff;
+  font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+}
+.photo-meta { padding: 8px; font-size: 12px; font-weight: 600; color: var(--text); display: flex; flex-direction: column; gap: 6px; }
+.photo-meta .req-tag { font-size: 10.5px; color: var(--warn); font-weight: 600; }
+.photo-slot.filled .req-tag { color: var(--success); }
+
+/* Car SVG Map */
+.car-map-wrap {
+  background: #0d1526; border: 1px solid var(--border);
+  border-radius: 12px; padding: 10px; text-align: center;
+}
+.car-map-svg { width: 100%; max-width: 320px; height: auto; display: block; margin: 0 auto; }
+.car-zone { fill: #1e293b; stroke: #475569; stroke-width: 2; cursor: pointer; transition: fill .15s, stroke .15s; }
+.car-zone:hover { fill: #2d3e5a; stroke: #60a5fa; }
+.car-zone.selected { fill: rgba(59, 130, 246, 0.45); stroke: #60a5fa; stroke-width: 2.5; }
+.car-zone.damaged { fill: rgba(239, 68, 68, 0.35); stroke: #f87171; }
+.car-zone.damaged.selected { fill: rgba(245, 158, 11, 0.45); stroke: #fbbf24; }
+.car-label { fill: #cbd5e1; font-size: 8.5px; font-weight: 700; text-anchor: middle; pointer-events: none; user-select: none; }
+
+/* Defect list */
+.defect-item {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 11px; margin-bottom: 9px;
+}
+.defect-item.is-pre { border-left: 4px solid var(--warn); }
+.defect-item.is-old { border-left: 4px solid var(--purple); }
+.defect-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+.defect-title { font-weight: 700; font-size: 14.5px; }
+.defect-actions { display: flex; gap: 5px; flex-shrink: 0; }
+.defect-desc { font-size: 13px; color: #cbd5e1; margin-bottom: 8px; }
+.defect-meta-line { font-size: 12px; color: #93c5fd; margin-bottom: 6px; font-weight: 600; }
+.defect-photos-strip { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.defect-photos-strip img {
+  width: 66px; height: 50px; object-fit: cover;
+  border-radius: 7px; border: 1px solid var(--border); cursor: pointer;
+}
+
+/* Case list */
+.case-card {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px; margin-bottom: 9px; cursor: pointer; transition: border-color .15s;
+}
+.case-card.current { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.22); }
+.case-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; }
+.case-title { font-weight: 700; font-size: 15px; }
+.case-meta { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Signature Canvas */
+.sig-box {
+  background: #ffffff; border-radius: 10px; border: 2px solid var(--border);
+  overflow: hidden; touch-action: none; position: relative;
+}
+.sig-canvas { width: 100%; height: 120px; display: block; touch-action: none; }
+.sig-hint { position: absolute; bottom: 6px; left: 10px; font-size: 11px; color: #94a3b8; pointer-events: none; }
+
+/* Audit checklist */
+.audit-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 8px 0; border-bottom: 1px solid rgba(42, 57, 88, 0.6); font-size: 13.5px;
+}
+.audit-row:last-child { border-bottom: none; }
+
+/* Bottom Nav */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-h);
+  background: rgba(15, 23, 42, 0.97); backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border); display: grid; grid-template-columns: repeat(5, 1fr);
+  z-index: 50; padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.nav-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; color: var(--muted); font-size: 11px; font-weight: 600; position: relative;
+}
+.nav-btn.active { color: #60a5fa; }
+.nav-btn.active::before {
+  content: ""; position: absolute; top: 0; left: 20%; right: 20%;
+  height: 3px; background: var(--primary); border-radius: 0 0 4px 4px;
+}
+.nav-icon { font-size: 19px; line-height: 1; }
+.nav-badge {
+  position: absolute; top: 5px; right: 16%;
+  background: var(--primary); color: #fff; font-size: 10px; font-weight: 700;
+  padding: 1px 5px; border-radius: 999px; min-width: 16px;
+}
+
+/* Modal & Photo Editor */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+  z-index: 100; display: none; align-items: center; justify-content: center; padding: 10px;
+}
+.modal-backdrop.open { display: flex; }
+.modal-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  max-width: 600px; width: 100%; max-height: 94vh; overflow-y: auto; padding: 12px;
+}
+.editor-stage {
+  background: #050811; border-radius: 10px; overflow: hidden;
+  border: 1px solid var(--border); margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: center;
+  touch-action: none;
+}
+#editor-canvas {
+  max-width: 100%; max-height: 48vh; width: auto; height: auto;
+  display: block; touch-action: none; cursor: crosshair;
+}
+.editor-toolbar {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  justify-content: space-between; margin-bottom: 10px;
+  background: var(--surface-2); padding: 8px; border-radius: 10px; border: 1px solid var(--border);
+}
+.tool-group { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+.tool-btn {
+  padding: 6px 9px; border-radius: 8px; font-size: 12px; font-weight: 700;
+  background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+}
+.tool-btn.active { background: rgba(59, 130, 246, 0.28); border-color: var(--primary); color: #fff; }
+.color-dot {
+  width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent;
+  display: inline-block;
+}
+.color-dot.active { border-color: #fff; box-shadow: 0 0 0 2px var(--primary); }
+
+/* Toast & Misc */
+.toast {
+  position: fixed; top: 64px; left: 50%;
+  transform: translateX(-50%) translateY(-16px);
+  background: #1e293b; color: #fff; border: 1px solid var(--primary);
+  padding: 10px 16px; border-radius: 12px; font-size: 13.5px; font-weight: 600;
+  z-index: 120; opacity: 0; pointer-events: none;
+  transition: opacity .2s, transform .2s; max-width: 92vw; text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.checkbox-row {
+  display: flex; align-items: center; gap: 9px; padding: 8px 10px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 10px; font-size: 13.5px; cursor: pointer;
+}
+.checkbox-row input { width: 18px; height: 18px; accent-color: var(--primary); }
+.hidden-input { display: none; }
+.info-note {
+  font-size: 12px; color: #93c5fd; background: rgba(59,130,246,0.12);
+  border: 1px solid rgba(59,130,246,0.3); border-radius: 9px; padding: 8px 10px; margin-top: 8px;
+}
+
+/* Print / PDF view */
+#print-area { display: none; }
+@media print {
+  body { background: #fff !important; color: #000 !important; font-family: "Times New Roman", Times, serif !important; font-size: 11pt !important; }
+  .topbar, .app-main, .bottom-nav, .modal-backdrop, .toast { display: none !important; }
+  #print-area { display: block !important; padding: 0; margin: 0; color: #000; }
+  #print-area h1 { font-size: 14pt; text-align: center; margin: 0 0 4pt; text-transform: uppercase; }
+  #print-area h2 { font-size: 11.5pt; margin: 10pt 0 5pt; border-bottom: 1px solid #000; padding-bottom: 2pt; }
+  #print-area .p-sub { text-align: center; font-size: 9.5pt; margin-bottom: 8pt; }
+  #print-area table { width: 100%; border-collapse: collapse; margin-bottom: 8pt; }
+  #print-area th, #print-area td { border: 1px solid #000; padding: 3.5pt 5pt; text-align: left; vertical-align: top; font-size: 9.5pt; }
+  #print-area th { background: #f1f5f9; font-weight: bold; }
+  #print-area .p-photo-grid { width: 100%; border-collapse: collapse; }
+  #print-area .p-photo-grid td { width: 50%; text-align: center; padding: 5pt; page-break-inside: avoid; }
+  #print-area .p-photo-grid img { max-width: 100%; max-height: 60mm; object-fit: contain; display: block; margin: 0 auto 3pt; }
+  #print-area .p-caption { font-size: 8.5pt; text-align: center; }
+  #print-area .p-pagebreak { page-break-before: always; }
+  #print-area .p-sig-table td { border: none !important; padding: 8pt 4pt; width: 50%; vertical-align: bottom; }
+  #print-area .p-sig-img { max-height: 22mm; max-width: 55mm; display: block; margin: 4pt 0; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-badge">755-П</div>
+    <div style="min-width:0">
+      <div class="brand-title" id="hdr-title">ЭкспертОсмотр v2.1</div>
+      <div class="brand-sub" id="hdr-sub">Автономный режим • 0 внешних библиотек</div>
+    </div>
+  </div>
+  <span class="status-pill" id="save-status">v2.1 ОК</span>
+</header>
+
+<main class="app-main">
+
+  <!-- TAB 1: ДЕЛА И ПРОФИЛЬ -->
+  <section class="tab-panel active" id="tab-cases">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">📁 Осмотры и файлы</h2>
+        <button class="btn btn-primary btn-sm" id="btn-new-case">+ Новый осмотр</button>
+      </div>
+      <div class="btn-row" style="margin-bottom:10px">
+        <button class="btn btn-secondary btn-sm" id="btn-import-case">📂 Открыть дело (.json)</button>
+        <button class="btn btn-warn btn-sm" id="btn-demo-case">⚡ Демо-дело v2.1</button>
+      </div>
+      <input type="file" id="inp-import-json" class="hidden-input" accept=".json,application/json">
+      <div id="cases-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">👨‍🔧 Профиль эксперта-техника</h2>
+      </div>
+      <p class="section-hint">Подставляется автоматически в шапку и подпись каждого Акта осмотра.</p>
+      <div class="field">
+        <label>ФИО эксперта-техника</label>
+        <input class="input" id="prof-name" placeholder="Иванов Иван Иванович">
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>№ в реестре МАК</label>
+          <input class="input" id="prof-mak" placeholder="Например: 5432">
+        </div>
+        <div class="field">
+          <label>Телефон</label>
+          <input class="input" id="prof-phone" placeholder="+7 (999) 000-00-00">
+        </div>
+      </div>
+      <div class="field">
+        <label>Организация / ИП</label>
+        <input class="input" id="prof-org" placeholder="ИП Иванов И.И. / ООО «АвтоЭксперт»">
+      </div>
+      <div class="field">
+        <label>Город по умолчанию</label>
+        <input class="input" id="prof-city" placeholder="г. Москва">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">💾 Резервное копирование базы</h2>
+      </div>
+      <p class="section-hint">На iPhone через «Команды» (data:) и при локальном открытии сохраняйте готовые дела в .json (в «Файлы» или «Избранное» Telegram) — поддерживается импорт из v2.0 и v2.1.</p>
+      <div class="btn-row">
+        <button class="btn btn-secondary btn-sm" id="btn-export-all">⬇ Бэкап всех дел (.json)</button>
+        <button class="btn btn-secondary btn-sm" id="btn-import-all">⬆ Восстановить бэкап</button>
+      </div>
+      <input type="file" id="inp-import-all" class="hidden-input" accept=".json,application/json">
+    </div>
+  </section>
+
+  <!-- TAB 2: КАРТОЧКА ТС И УСЛОВИЯ 755-П -->
+  <section class="tab-panel" id="tab-card">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">📋 Реквизиты осмотра</h2>
+        <span class="badge badge-info" id="card-act-badge">Акт №—</span>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Номер дела / Акта</label>
+          <input class="input" data-field="actNumber" placeholder="2026-001">
+        </div>
+        <div class="field">
+          <label>Дата ДТП</label>
+          <input class="input" type="date" data-field="dtpDate">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Дата осмотра</label>
+          <input class="input" type="date" data-field="inspectDate">
+        </div>
+        <div class="field">
+          <label>Время начала</label>
+          <input class="input" type="time" data-field="inspectTime">
+        </div>
+      </div>
+      <div class="field">
+        <label>Место осмотра (адрес) <span id="gps-badge" style="color:#60a5fa;font-weight:600"></span></label>
+        <div class="input-row">
+          <input class="input" data-field="address" placeholder="г. Москва, ул. Примерная, д. 10">
+          <button class="btn btn-secondary btn-sm" id="btn-gps" title="Определить GPS">📍 GPS</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">🚗 Данные транспортного средства</h2>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Марка и модель</label>
+          <input class="input" data-field="carModel" placeholder="Kia Rio / Toyota Camry">
+        </div>
+        <div class="field">
+          <label>Гос. рег. знак</label>
+          <input class="input" data-field="plate" placeholder="А123ВС777" style="text-transform:uppercase">
+        </div>
+      </div>
+      <div class="field">
+        <label>VIN / Номер кузова <span id="vin-status" class="badge badge-warn">0 / 17</span></label>
+        <input class="input" data-field="vin" maxlength="17" placeholder="Z94C241BBLR123456" style="text-transform:uppercase;letter-spacing:1px;font-family:monospace">
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Год выпуска</label>
+          <input class="input" type="number" inputmode="numeric" data-field="year" placeholder="2021">
+        </div>
+        <div class="field">
+          <label>Пробег (км)</label>
+          <input class="input" type="number" inputmode="numeric" data-field="mileage" placeholder="64500">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Цвет кузова</label>
+          <input class="input" data-field="color" placeholder="Белый / Серый металлик">
+        </div>
+        <div class="field">
+          <label>СТС / ПТС (серия, №)</label>
+          <input class="input" data-field="sts" placeholder="99 12 345678">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Тип кузова / КПП</label>
+          <input class="input" data-field="bodyType" placeholder="Седан, АКПП">
+        </div>
+        <div class="field">
+          <label>Состояние ТС (до ДТП)</label>
+          <select class="input" data-field="condition">
+            <option value="Удовлетворительное">Удовлетворительное</option>
+            <option value="Хорошее">Хорошее</option>
+            <option value="Имеются эксплуатационные дефекты">Есть экспл. дефекты</option>
+            <option value="Аварийное (не на ходу)">Не на ходу</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" style="margin-top:10px">
+        <label>Значимые опции комплектации (для расчёта)</label>
+        <div class="chips" id="equip-chips"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">🌦 Условия осмотра (Положение № 755-П)</h2>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Освещение</label>
+          <select class="input" data-field="lighting">
+            <option value="Естественное, достаточное">Естественное, достаточное</option>
+            <option value="Искусственное, достаточное">Искусственное, достаточное</option>
+            <option value="Смешанное (бокс/паркинг)">Смешанное (бокс/паркинг)</option>
+            <option value="Недостаточное (сумерки)">Недостаточное (сумерки)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Погодные условия</label>
+          <select class="input" data-field="weather">
+            <option value="Ясно, сухо">Ясно, сухо</option>
+            <option value="Пасмурно, без осадков">Пасмурно, без осадков</option>
+            <option value="Дождь / мокрый кузов">Дождь / мокрый кузов</option>
+            <option value="Снег / отрицательная t°">Снег / мороз</option>
+            <option value="В закрытом помещении">В помещении (СТО/паркинг)</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Чистота кузова</label>
+          <select class="input" data-field="cleanliness">
+            <option value="Чистый">Чистый</option>
+            <option value="Частично загрязнён">Частично загрязнён</option>
+            <option value="Сильно загрязнён (осмотр затруднён)">Сильно загрязнён</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Запуск ДВС / приборы</label>
+          <select class="input" data-field="ignition">
+            <option value="Зажигание вкл., пробег считан">Зажигание вкл., ОК</option>
+            <option value="АКБ разряжена, пробег не считан">АКБ разряжена</option>
+            <option value="Ключи отсутствуют">Ключи отсутствуют</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">👥 Участники и ОСАГО</h2>
+      </div>
+      <div class="field">
+        <label>Заказчик / Собственник (ФИО)</label>
+        <input class="input" data-field="ownerName" placeholder="Петров Пётр Петрович">
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Телефон заказчика</label>
+          <input class="input" data-field="ownerPhone" placeholder="+7 (900) 111-22-33">
+        </div>
+        <div class="field">
+          <label>Страховая компания</label>
+          <input class="input" data-field="insurer" placeholder="Ингосстрах / Альфа / РЕСО">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Полис ОСАГО / № убытка</label>
+          <input class="input" data-field="policy" placeholder="ХХХ 0123456789">
+        </div>
+        <div class="field">
+          <label>Представитель СК / иные лица</label>
+          <input class="input" data-field="presentPersons" placeholder="Не явился / ФИО представителя">
+        </div>
+      </div>
+      <div class="field">
+        <label>Особые отметки и пояснения сторон</label>
+        <textarea class="input" data-field="notes" placeholder="Дополнительные сведения по обстоятельствам ДТП, предыдущим ремонтам, замерам ЛКП..."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 3: ФОТО-ЧЕКЛИСТ 755-П -->
+  <section class="tab-panel" id="tab-photos">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">📸 Обязательные ракурсы (755-П)</h2>
+        <span class="badge badge-info" id="photo-progress-text">0 / 10</span>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar" id="photo-progress-bar"></div></div>
+      <p class="section-hint" style="margin-top:6px">Нажмите на любое готовое фото, чтобы <b>нарисовать стрелки/обводку</b> или поменять подпись.</p>
+      <label class="checkbox-row" style="margin-bottom:10px">
+        <input type="checkbox" id="chk-watermark" checked>
+        <span>Штамп даты/времени и GPS в углу фото</span>
+      </label>
+      <div class="photo-grid" id="mandatory-photos-grid"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">➕ Дополнительные фото</h2>
+        <button class="btn btn-primary btn-sm" id="btn-add-extra-photo">📷 Добавить фото</button>
+      </div>
+      <p class="section-hint">Общие планы, скрытые полости, замеры толщиномером, шины, дополнительные ракурсы с линейкой.</p>
+      <div class="photo-grid" id="extra-photos-grid"></div>
+    </div>
+
+    <input type="file" id="inp-camera" class="hidden-input" accept="image/*" capture="environment">
+    <input type="file" id="inp-gallery" class="hidden-input" accept="image/*" multiple>
+  </section>
+
+  <!-- TAB 4: ДЕФЕКТЫ И РАСШИРЕННАЯ СХЕМА -->
+  <section class="tab-panel" id="tab-defects">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">🚘 Расширенная схема узлов</h2>
+        <span class="badge badge-info" id="selected-zone-badge">Выберите деталь</span>
+      </div>
+      <div class="subtabs" id="zone-subtabs">
+        <button type="button" class="subtab-btn active" data-zone-tab="zone-body">🚗 Кузов</button>
+        <button type="button" class="subtab-btn" data-zone-tab="zone-underhood">⚙ Подкапот</button>
+        <button type="button" class="subtab-btn" data-zone-tab="zone-salon">💺 Салон/SRS</button>
+        <button type="button" class="subtab-btn" data-zone-tab="zone-tires">🛞 Шины</button>
+      </div>
+
+      <!-- Zone 1: Exterior SVG -->
+      <div class="zone-panel active" id="zone-body">
+        <p class="section-hint">Нажмите элемент на схеме — название подставится в форму. Красным отмечены уже зафиксированные детали.</p>
+        <div class="car-map-wrap">
+          <svg class="car-map-svg" viewBox="0 0 320 460" id="car-svg">
+            <!-- Передний бампер -->
+            <path class="car-zone" data-part="Бампер передний" d="M68,20 Q160,2 252,20 L246,48 Q160,36 74,48 Z"/>
+            <text class="car-label" x="160" y="30">ПЕРЕДНИЙ БАМПЕР</text>
+            <!-- Решётка радиатора -->
+            <rect class="car-zone" data-part="Решётка радиатора" x="118" y="46" width="84" height="16" rx="4"/>
+            <text class="car-label" x="160" y="57">РЕШЁТКА</text>
+            <!-- Фары -->
+            <rect class="car-zone" data-part="Фара передняя левая" x="50" y="48" width="42" height="24" rx="6"/>
+            <text class="car-label" x="71" y="63">ФАРА Л</text>
+            <rect class="car-zone" data-part="Фара передняя правая" x="228" y="48" width="42" height="24" rx="6"/>
+            <text class="car-label" x="249" y="63">ФАРА П</text>
+            <!-- Капот -->
+            <path class="car-zone" data-part="Капот" d="M94,66 L226,66 L234,142 L86,142 Z"/>
+            <text class="car-label" x="160" y="108">КАПОТ</text>
+            <!-- Крылья передние -->
+            <path class="car-zone" data-part="Крыло переднее левое" d="M44,76 L88,76 L84,160 L40,160 Z"/>
+            <text class="car-label" x="64" y="121">КР.П.Л</text>
+            <path class="car-zone" data-part="Крыло переднее правое" d="M232,76 L276,76 L280,160 L236,160 Z"/>
+            <text class="car-label" x="256" y="121">КР.П.П</text>
+            <!-- Зеркала -->
+            <rect class="car-zone" data-part="Зеркало наружное левое" x="8" y="148" width="28" height="20" rx="5"/>
+            <text class="car-label" x="22" y="161">ЗЕР.Л</text>
+            <rect class="car-zone" data-part="Зеркало наружное правое" x="284" y="148" width="28" height="20" rx="5"/>
+            <text class="car-label" x="298" y="161">ЗЕР.П</text>
+            <!-- Лобовое стекло -->
+            <path class="car-zone" data-part="Стекло ветровое (лобовое)" d="M88,146 L232,146 L222,196 L98,196 Z"/>
+            <text class="car-label" x="160" y="175">ЛОБОВОЕ</text>
+            <!-- Двери передние -->
+            <rect class="car-zone" data-part="Дверь передняя левая" x="38" y="166" width="46" height="74" rx="5"/>
+            <text class="car-label" x="61" y="206">ДВ.П.Л</text>
+            <rect class="car-zone" data-part="Дверь передняя правая" x="236" y="166" width="46" height="74" rx="5"/>
+            <text class="car-label" x="259" y="206">ДВ.П.П</text>
+            <!-- Пороги -->
+            <rect class="car-zone" data-part="Порог левый" x="16" y="174" width="18" height="140" rx="5"/>
+            <text class="car-label" x="25" y="246" transform="rotate(-90 25 246)">ПОРОГ Л</text>
+            <rect class="car-zone" data-part="Порог правый" x="286" y="174" width="18" height="140" rx="5"/>
+            <text class="car-label" x="295" y="246" transform="rotate(90 295 246)">ПОРОГ П</text>
+            <!-- Крыша -->
+            <rect class="car-zone" data-part="Крыша" x="96" y="200" width="128" height="104" rx="8"/>
+            <text class="car-label" x="160" y="256">КРЫША</text>
+            <!-- Двери задние -->
+            <rect class="car-zone" data-part="Дверь задняя левая" x="38" y="244" width="46" height="74" rx="5"/>
+            <text class="car-label" x="61" y="284">ДВ.З.Л</text>
+            <rect class="car-zone" data-part="Дверь задняя правая" x="236" y="244" width="46" height="74" rx="5"/>
+            <text class="car-label" x="259" y="284">ДВ.З.П</text>
+            <!-- Заднее стекло -->
+            <path class="car-zone" data-part="Стекло заднее" d="M98,308 L222,308 L230,348 L90,348 Z"/>
+            <text class="car-label" x="160" y="331">ЗАД. СТЕКЛО</text>
+            <!-- Крылья задние -->
+            <path class="car-zone" data-part="Крыло заднее левое" d="M40,322 L84,322 L86,392 L46,392 Z"/>
+            <text class="car-label" x="64" y="360">КР.З.Л</text>
+            <path class="car-zone" data-part="Крыло заднее правое" d="M236,322 L280,322 L274,392 L234,392 Z"/>
+            <text class="car-label" x="256" y="360">КР.З.П</text>
+            <!-- Крышка багажника -->
+            <rect class="car-zone" data-part="Крышка багажника / дверь задка" x="92" y="352" width="136" height="44" rx="6"/>
+            <text class="car-label" x="160" y="378">БАГАЖНИК</text>
+            <!-- Фонари -->
+            <rect class="car-zone" data-part="Фонарь задний левый" x="50" y="394" width="42" height="20" rx="5"/>
+            <text class="car-label" x="71" y="407">ФОН.Л</text>
+            <rect class="car-zone" data-part="Фонарь задний правый" x="228" y="394" width="42" height="20" rx="5"/>
+            <text class="car-label" x="249" y="407">ФОН.П</text>
+            <!-- Задний бампер -->
+            <path class="car-zone" data-part="Бампер задний" d="M70,418 Q160,426 250,418 L244,444 Q160,456 76,444 Z"/>
+            <text class="car-label" x="160" y="437">ЗАДНИЙ БАМПЕР</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Zone 2: Underhood & chassis -->
+      <div class="zone-panel" id="zone-underhood">
+        <p class="section-hint">Подкапотное пространство, силовая структура и ходовая часть:</p>
+        <div class="parts-grid" id="grid-underhood"></div>
+      </div>
+
+      <!-- Zone 3: Salon & SRS -->
+      <div class="zone-panel" id="zone-salon">
+        <p class="section-hint">Элементы салона и системы пассивной безопасности (SRS):</p>
+        <div class="parts-grid" id="grid-salon"></div>
+        <div class="info-note">ℹ По Положению ЦБ № 755-П к элементам систем безопасности (подушки, ремни, преднатяжители, блоки SRS) применяется нулевой износ (0%).</div>
+      </div>
+
+      <!-- Zone 4: Tires & Wheels -->
+      <div class="zone-panel" id="zone-tires">
+        <p class="section-hint">Выберите повреждённое колесо/диск или заполните данные шин для расчёта износа:</p>
+        <div class="parts-grid" id="grid-tires" style="margin-bottom:12px"></div>
+        <div style="border-top:1px solid var(--border);padding-top:10px">
+          <div class="grid-2">
+            <div class="field">
+              <label>Марка и модель шин</label>
+              <input class="input" data-field="tireBrand" placeholder="Nokian Hakkapeliitta / Michelin">
+            </div>
+            <div class="field">
+              <label>Размерность</label>
+              <input class="input" data-field="tireSize" placeholder="205/55 R16">
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label>Сезонность шин</label>
+              <select class="input" data-field="tireSeason">
+                <option value="">Не указано</option>
+                <option value="Летние">Летние</option>
+                <option value="Зимние (шипованные)">Зимние (шипы)</option>
+                <option value="Зимние (фрикционные)">Зимние (липучка)</option>
+                <option value="Всесезонные">Всесезонные</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Тип колёсных дисков</label>
+              <select class="input" data-field="diskType">
+                <option value="">Не указано</option>
+                <option value="Легкосплавные (оригинал)">Литые (оригинал)</option>
+                <option value="Легкосплавные (неоригинал)">Литые (неоригинал)</option>
+                <option value="Штампованные с колпаками">Штампованные</option>
+              </select>
+            </div>
+          </div>
+          <div class="field" style="margin-top:6px">
+            <label>Остаточная глубина протектора (мм)</label>
+            <div class="grid-4">
+              <input class="input" type="number" step="0.5" inputmode="decimal" data-field="treadFL" placeholder="ПЛ мм">
+              <input class="input" type="number" step="0.5" inputmode="decimal" data-field="treadFR" placeholder="ПП мм">
+              <input class="input" type="number" step="0.5" inputmode="decimal" data-field="treadRL" placeholder="ЗЛ мм">
+              <input class="input" type="number" step="0.5" inputmode="decimal" data-field="treadRR" placeholder="ЗП мм">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Defect Form (Add / Edit) -->
+    <div class="card" id="defect-form-card">
+      <div class="card-header">
+        <h2 class="card-title" id="defect-form-title">🔧 Добавить повреждение</h2>
+        <button type="button" class="btn btn-secondary btn-xs" id="btn-cancel-edit" style="display:none">✕ Отмена правки</button>
+      </div>
+      <div class="field">
+        <label>Наименование детали / узла</label>
+        <input class="input" id="def-part" placeholder="Выберите на схеме или введите деталь">
+      </div>
+
+      <div class="field">
+        <label>Принадлежность дефекта (755-П)</label>
+        <div class="chips" id="def-rel-chips"></div>
+      </div>
+
+      <div class="field">
+        <label>Толщина ЛКП (толщиномер, мкм)</label>
+        <input class="input" id="def-lkp" placeholder="Например: 115–130 мкм или 480 мкм (шпаклёвка)">
+        <div class="chips" id="def-lkp-presets" style="margin-top:6px"></div>
+      </div>
+
+      <div class="field">
+        <label>Характер повреждения (можно несколько)</label>
+        <div class="chips" id="def-type-chips"></div>
+      </div>
+
+      <div class="field">
+        <label>Ремонтные воздействия (коды 755-П)</label>
+        <div class="chips" id="def-code-chips"></div>
+      </div>
+
+      <div class="field">
+        <label>
+          <span>Описание повреждения (размеры, зона, ЛКП)</span>
+          <button type="button" class="btn btn-secondary btn-xs" id="btn-voice">🎙 Диктовка</button>
+        </label>
+        <textarea class="input" id="def-desc" placeholder="Например: залом в нижней части 18×12 см с нарушением ЛКП до металла..."></textarea>
+        <div class="chips" id="quick-phrases" style="margin-top:6px"></div>
+      </div>
+
+      <div class="field">
+        <label>Детальные фото этого повреждения (с линейкой)</label>
+        <div class="btn-row" style="margin-bottom:8px">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-def-cam">📷 Снять с камеры</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-def-gal">🖼 Из галереи</button>
+        </div>
+        <div class="defect-photos-strip" id="def-draft-photos"></div>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="btn-add-defect">+ Внести повреждение в Акт</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">📝 Зафиксированные повреждения</h2>
+        <span class="badge badge-info" id="defects-count-badge">0 шт.</span>
+      </div>
+      <label class="checkbox-row" style="margin-bottom:10px">
+        <input type="checkbox" id="chk-hidden-damages" checked>
+        <span>Добавить оговорку: «Возможны скрытые повреждения»</span>
+      </label>
+      <div id="defects-list"></div>
+    </div>
+  </section>
+
+  <!-- TAB 5: ПОДПИСИ, ЭКСПОРТ И БЭКАП -->
+  <section class="tab-panel" id="tab-export">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">✅ Расширенный аудитор 755-П</h2>
+      </div>
+      <div id="audit-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">✍ Подписи сторон (пальцем на экране)</h2>
+      </div>
+      <div class="field">
+        <label>
+          <span>Подпись эксперта-техника</span>
+          <button class="btn btn-secondary btn-xs" id="btn-clear-sig-exp">Очистить</button>
+        </label>
+        <div class="sig-box">
+          <canvas class="sig-canvas" id="sig-expert"></canvas>
+          <span class="sig-hint">Распишитесь здесь</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>
+          <span>Подпись заказчика / собственника</span>
+          <button class="btn btn-secondary btn-xs" id="btn-clear-sig-cli">Очистить</button>
+        </label>
+        <div class="sig-box">
+          <canvas class="sig-canvas" id="sig-client"></canvas>
+          <span class="sig-hint">Распишитесь здесь</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">📄 Сборка документов (100% офлайн)</h2>
+      </div>
+      <div class="field">
+        <label>Плотность фототаблицы в Word</label>
+        <select class="input" id="sel-photo-layout">
+          <option value="2">Крупно (2 фото в ряд, ~4 фото на лист)</option>
+          <option value="compact">Компактно (2 фото в ряд, ~6 фото на лист)</option>
+        </select>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;margin-top:10px">
+        <button class="btn btn-success btn-full" id="btn-export-docx">⬇ Скачать Акт и Фототаблицу (.docx)</button>
+        <button class="btn btn-primary btn-full" id="btn-export-print">🖨 Печать / Сохранить в PDF</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">💾 Резервная копия этого дела</h2>
+      </div>
+      <p class="section-hint">Сохраняет все поля, замеры ЛКП, шины, подписи и отредактированные фото в один файл .json.</p>
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="btn-backup-case">⬇ Сохранить дело (.json)</button>
+        <button class="btn btn-danger" id="btn-delete-case">🗑 Удалить дело</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-tab="tab-cases">
+    <span class="nav-icon">📁</span><span>Дела</span>
+  </button>
+  <button class="nav-btn" data-tab="tab-card">
+    <span class="nav-icon">🚗</span><span>Карточка</span>
+  </button>
+  <button class="nav-btn" data-tab="tab-photos">
+    <span class="nav-icon">📸</span><span>Фото</span>
+    <span class="nav-badge" id="nav-photo-badge">0</span>
+  </button>
+  <button class="nav-btn" data-tab="tab-defects">
+    <span class="nav-icon">🔧</span><span>Дефекты</span>
+    <span class="nav-badge" id="nav-defect-badge">0</span>
+  </button>
+  <button class="nav-btn" data-tab="tab-export">
+    <span class="nav-icon">📄</span><span>Экспорт</span>
+  </button>
+</nav>
+
+<!-- Lightbox + Annotation Editor Modal -->
+<div class="modal-backdrop" id="photo-modal">
+  <div class="modal-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <strong style="font-size:14px">✏ Разметка и подпись фото</strong>
+      <span style="font-size:11.5px;color:var(--muted)" id="editor-hint">Ведите пальцем по фото</span>
+    </div>
+
+    <div class="editor-toolbar">
+      <div class="tool-group">
+        <button type="button" class="tool-btn active" data-tool="arrow">↗ Стрелка</button>
+        <button type="button" class="tool-btn" data-tool="circle">⭕ Обводка</button>
+        <button type="button" class="tool-btn" data-tool="pen">✏ Маркер</button>
+      </div>
+      <div class="tool-group">
+        <button type="button" class="color-dot active" data-color="#ef4444" style="background:#ef4444" title="Красный"></button>
+        <button type="button" class="color-dot" data-color="#facc15" style="background:#facc15" title="Жёлтый"></button>
+        <button type="button" class="color-dot" data-color="#22c55e" style="background:#22c55e" title="Зелёный"></button>
+        <button type="button" class="color-dot" data-color="#ffffff" style="background:#ffffff" title="Белый"></button>
+      </div>
+      <div class="tool-group">
+        <button type="button" class="tool-btn" id="ed-undo">↩ Отмена</button>
+        <button type="button" class="tool-btn" id="ed-reset">🔄 Сброс</button>
+      </div>
+    </div>
+
+    <div class="editor-stage">
+      <canvas id="editor-canvas"></canvas>
+    </div>
+
+    <div class="field">
+      <label>Подпись фото в фототаблице</label>
+      <input class="input" id="modal-caption">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="modal-save">💾 Сохранить</button>
+      <button class="btn btn-danger" id="modal-delete">🗑 Удалить</button>
+      <button class="btn btn-secondary" id="modal-close">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="print-area"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  /* ==================== CONSTANTS ==================== */
+  const MANDATORY_SLOTS = [
+    { id: 'front_left',  title: 'Общий вид спереди-слева (3/4)' },
+    { id: 'front_right', title: 'Общий вид спереди-справа (3/4)' },
+    { id: 'rear_left',   title: 'Общий вид сзади-слева (3/4)' },
+    { id: 'rear_right',  title: 'Общий вид сзади-справа (3/4)' },
+    { id: 'vin_body',    title: 'VIN-номер на кузове / под стеклом' },
+    { id: 'vin_plate',   title: 'Заводская табличка (шильда)' },
+    { id: 'odometer',    title: 'Одометр (при вкл. зажигании)' },
+    { id: 'docs_sts',    title: 'СТС / документы на ТС' },
+    { id: 'impact_zone', title: 'Общий вид зоны повреждений' },
+    { id: 'ruler_detail',title: 'Детальное фото с масштабной линейкой' }
+  ];
+
+  const EQUIPMENT_LIST = [
+    'LED / матричные фары', 'Парктроники', 'Камера заднего вида / 360°',
+    'Радар / дистроник', 'Панорамная крыша', 'Бесключевой доступ',
+    'Датчики слепых зон', 'Обогрев лобового'
+  ];
+
+  const UNDERHOOD_PARTS = [
+    'Панель передняя (телевизор)', 'Усилитель бампера передний',
+    'Абсорбер бампера передний', 'Радиатор охлаждения ДВС',
+    'Радиатор кондиционера', 'Вентилятор охлаждения (диффузор)',
+    'Лонжерон передний левый', 'Лонжерон передний правый',
+    'Брызговик (щит крыла) левый', 'Брызговик (щит крыла) правый',
+    'Подрамник передний', 'Стойка амортизатора передняя Л',
+    'Стойка амортизатора передняя П', 'Рычаг подвески передний Л',
+    'Рычаг подвески передний П', 'Рулевая рейка / тяга',
+    'Бачок омывателя', 'Корпус воздушного фильтра',
+    'Панель задняя кузова', 'Усилитель бампера задний'
+  ];
+
+  const SALON_SRS_PARTS = [
+    'Подушка безопасности водителя (SRS)', 'Подушка безопасности пассажира (SRS)',
+    'Торпедо (панель приборов)', 'Шторка безопасности левая (SRS)',
+    'Шторка безопасности правая (SRS)', 'Боковая подушка сиденья левая (SRS)',
+    'Боковая подушка сиденья правая (SRS)', 'Ремень безопасности пер. левый (SRS)',
+    'Ремень безопасности пер. правый (SRS)', 'Блок управления SRS',
+    'Обшивка потолка', 'Обшивка двери / стойки салона'
+  ];
+
+  const TIRE_WHEEL_PARTS = [
+    'Колесо / диск переднее левое', 'Колесо / диск переднее правое',
+    'Колесо / диск заднее левое', 'Колесо / диск заднее правое',
+    'Шина передняя левая', 'Шина передняя правая',
+    'Шина задняя левая', 'Шина задняя правая'
+  ];
+
+  const DAMAGE_TYPES = [
+    'Деформация', 'Залом', 'Разрыв / пролом', 'Трещина',
+    'Царапина / притёртость', 'Скол ЛКП', 'Нарушение зазоров', 'Разрушение'
+  ];
+
+  const ACTION_CODES = [
+    { code: 'З',   label: 'З — Замена' },
+    { code: 'Р1',  label: 'Р1 — Ремонт 1 ст.' },
+    { code: 'Р2',  label: 'Р2 — Ремонт 2 ст.' },
+    { code: 'Р3',  label: 'Р3 — Ремонт 3 ст.' },
+    { code: 'О',   label: 'О — Окраска' },
+    { code: 'С/У', label: 'С/У — Снятие/уст.' },
+    { code: 'СКР', label: 'СКР — Скрытые' },
+    { code: 'П',   label: 'П — Проверка геом.' }
+  ];
+
+  const DEFECT_RELATIONS = [
+    { id: 'dtp', label: 'Относится к ДТП', cls: 'rel-dtp', badgeCls: 'badge-ok', docText: 'Относится к ДТП' },
+    { id: 'pre', label: 'Доаварийный / экспл.', cls: 'rel-pre', badgeCls: 'badge-warn', docText: 'ДОАВАРИЙНЫЙ (эксплуатационный)' },
+    { id: 'old', label: 'Следы старого ремонта', cls: 'rel-old', badgeCls: 'badge-purple', docText: 'СЛЕДЫ ПРЕДЫДУЩЕГО РЕМОНТА' }
+  ];
+
+  const LKP_PRESETS = [
+    'Завод (100–140 мкм)', 'Вторичн. окрас (200–350 мкм)', 'Шпаклёвка (>500 мкм)', 'Пластик / н/д'
+  ];
+
+  const QUICK_PHRASES = [
+    'до металла', 'до грунта', 'залом ребра жёсткости', 'разрушение креплений',
+    'нарушение зазора', 'смещение элемента', 'сквозная трещина',
+    'следы коррозии', 'ранее ремонтировалась', 'требуется проверка на стапеле'
+  ];
+
+  /* ==================== STORAGE ==================== */
+  const DB_NAME = 'Osmotr755OfflineDB';
+  const DB_VER = 1;
+  const STORE_NAME = 'kv';
+  let dbInstance = null;
+  let useLocalStorageFallback = false;
+
+  function openDB() {
+    return new Promise((resolve) => {
+      if (!window.indexedDB) { useLocalStorageFallback = true; resolve(null); return; }
+      try {
+        const req = indexedDB.open(DB_NAME, DB_VER);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
+        };
+        req.onsuccess = (e) => { dbInstance = e.target.result; resolve(dbInstance); };
+        req.onerror = () => { useLocalStorageFallback = true; resolve(null); };
+      } catch (err) { useLocalStorageFallback = true; resolve(null); }
+    });
+  }
+
+  function storageGet(key) {
+    return new Promise((resolve) => {
+      if (useLocalStorageFallback || !dbInstance) {
+        try {
+          const raw = localStorage.getItem('osmotr755_' + key);
+          resolve(raw ? JSON.parse(raw) : null);
+        } catch (e) { resolve(null); }
+        return;
+      }
+      try {
+        const tx = dbInstance.transaction(STORE_NAME, 'readonly');
+        const req = tx.objectStore(STORE_NAME).get(key);
+        req.onsuccess = () => resolve(req.result ?? null);
+        req.onerror = () => resolve(null);
+      } catch (e) { resolve(null); }
+    });
+  }
+
+  function storageSet(key, val) {
+    return new Promise((resolve) => {
+      if (useLocalStorageFallback || !dbInstance) {
+        try { localStorage.setItem('osmotr755_' + key, JSON.stringify(val)); }
+        catch (e) { toast('Память браузера переполнена — сохраните дело в файл (.json)'); }
+        resolve();
+        return;
+      }
+      try {
+        const tx = dbInstance.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).put(val, key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+      } catch (e) { resolve(); }
+    });
+  }
+
+  /* ==================== STATE ==================== */
+  let state = {
+    profile: { name: '', mak: '', phone: '', org: '', city: '' },
+    cases: [],
+    currentCaseId: null,
+    watermark: true,
+    photoLayout: '2'
+  };
+
+  let draftDefect = {
+    editingId: null,
+    relation: 'dtp',
+    types: [],
+    codes: [],
+    photos: []
+  };
+
+  let activePhotoTarget = null;
+  let modalPhotoRef = null;
+
+  function uid() {
+    return 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
+  }
+  function todayISO() {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+  function nowTime() {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+  function formatDateRU(iso) {
+    if (!iso) return '___.___.20___';
+    const parts = iso.split('-');
+    if (parts.length !== 3) return iso;
+    return `${parts[2]}.${parts[1]}.${parts[0]}`;
+  }
+
+  function normalizeCase(c) {
+    return {
+      id: c.id || uid(),
+      createdAt: c.createdAt || Date.now(),
+      updatedAt: c.updatedAt || Date.now(),
+      actNumber: c.actNumber || '',
+      dtpDate: c.dtpDate || '',
+      inspectDate: c.inspectDate || todayISO(),
+      inspectTime: c.inspectTime || nowTime(),
+      address: c.address || '',
+      gps: c.gps || '',
+      carModel: c.carModel || '',
+      plate: c.plate || '',
+      vin: c.vin || '',
+      year: c.year || '',
+      mileage: c.mileage || '',
+      color: c.color || '',
+      sts: c.sts || '',
+      bodyType: c.bodyType || '',
+      condition: c.condition || 'Удовлетворительное',
+      equipment: Array.isArray(c.equipment) ? c.equipment : [],
+      lighting: c.lighting || 'Естественное, достаточное',
+      weather: c.weather || 'Ясно, сухо',
+      cleanliness: c.cleanliness || 'Чистый',
+      ignition: c.ignition || 'Зажигание вкл., пробег считан',
+      ownerName: c.ownerName || '',
+      ownerPhone: c.ownerPhone || '',
+      insurer: c.insurer || '',
+      policy: c.policy || '',
+      presentPersons: c.presentPersons || 'Представитель СК не явился',
+      notes: c.notes || '',
+      tireBrand: c.tireBrand || '',
+      tireSize: c.tireSize || '',
+      tireSeason: c.tireSeason || '',
+      diskType: c.diskType || '',
+      treadFL: c.treadFL || '',
+      treadFR: c.treadFR || '',
+      treadRL: c.treadRL || '',
+      treadRR: c.treadRR || '',
+      hiddenDamagesClause: c.hiddenDamagesClause !== undefined ? c.hiddenDamagesClause : true,
+      mandatoryPhotos: c.mandatoryPhotos || {},
+      extraPhotos: Array.isArray(c.extraPhotos) ? c.extraPhotos : [],
+      defects: Array.isArray(c.defects) ? c.defects.map(d => ({
+        id: d.id || uid(),
+        part: d.part || '',
+        relation: d.relation || 'dtp',
+        lkp: d.lkp || '',
+        types: Array.isArray(d.types) ? d.types : [],
+        codes: Array.isArray(d.codes) ? d.codes : [],
+        desc: d.desc || '',
+        photos: Array.isArray(d.photos) ? d.photos : []
+      })) : [],
+      sigExpert: c.sigExpert || '',
+      sigClient: c.sigClient || ''
+    };
+  }
+
+  function createEmptyCase() {
+    const num = String(state.cases.length + 1).padStart(3, '0');
+    const year = new Date().getFullYear();
+    return normalizeCase({
+      actNumber: `${year}-${num}`,
+      address: state.profile.city ? state.profile.city + ', ' : ''
+    });
+  }
+
+  function getCurrentCase() {
+    let c = state.cases.find(x => x.id === state.currentCaseId);
+    if (!c) {
+      if (state.cases.length === 0) {
+        c = createEmptyCase();
+        state.cases.unshift(c);
+      } else {
+        c = state.cases[0];
+      }
+      state.currentCaseId = c.id;
+    }
+    return c;
+  }
+
+  let saveTimer = null;
+  function scheduleSave(immediate) {
+    const c = getCurrentCase();
+    c.updatedAt = Date.now();
+    const pill = document.getElementById('save-status');
+    pill.textContent = 'Сохранение...';
+    clearTimeout(saveTimer);
+    const run = async () => {
+      await storageSet('app_state_v2', state);
+      pill.textContent = useLocalStorageFallback ? 'v2.1 (LS)' : 'v2.1 офлайн';
+    };
+    if (immediate) run();
+    else saveTimer = setTimeout(run, 250);
+  }
+
+  /* ==================== UI HELPERS ==================== */
+  let toastTimer = null;
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+  }
+
+  function escapeHtml(s) {
+    return String(s || '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function validateVIN(vin) {
+    const clean = (vin || '').toUpperCase().replace(/\s+/g, '');
+    if (!clean) return { state: 'empty', text: '0 / 17' };
+    if (/[IOQА-ЯЁ]/i.test(clean)) return { state: 'err', text: 'Запрещ. символы (I/O/Q/кир.)' };
+    if (clean.length === 17 && /^[A-HJ-NPR-Z0-9]{17}$/.test(clean)) return { state: 'ok', text: '17 / 17 ✓' };
+    return { state: 'warn', text: `${clean.length} / 17` };
+  }
+
+  function getRelMeta(relId) {
+    return DEFECT_RELATIONS.find(r => r.id === relId) || DEFECT_RELATIONS[0];
+  }
+
+  function getAllOrderedPhotos(c) {
+    const list = [];
+    let num = 1;
+    for (const slot of MANDATORY_SLOTS) {
+      const p = c.mandatoryPhotos[slot.id];
+      if (p && p.dataUrl) {
+        list.push({
+          num: num++, dataUrl: p.dataUrl,
+          width: p.width || 1200, height: p.height || 900,
+          caption: p.caption || slot.title, source: 'mandatory'
+        });
+      }
+    }
+    (c.defects || []).forEach((d, idx) => {
+      const codeStr = d.codes && d.codes.length ? ` (${d.codes.join(', ')})` : '';
+      const relStr = d.relation && d.relation !== 'dtp' ? ` [${getRelMeta(d.relation).label}]` : '';
+      const autoCap = `(к п. ${idx + 1} Акта) ${d.part}${codeStr}${relStr}`;
+      for (const p of (d.photos || [])) {
+        if (p && p.dataUrl) {
+          list.push({
+            num: num++, dataUrl: p.dataUrl,
+            width: p.width || 1200, height: p.height || 900,
+            caption: p.caption || autoCap, source: 'defect'
+          });
+        }
+      }
+    });
+    for (const p of (c.extraPhotos || [])) {
+      if (p && p.dataUrl) {
+        list.push({
+          num: num++, dataUrl: p.dataUrl,
+          width: p.width || 1200, height: p.height || 900,
+          caption: p.caption || 'Дополнительное фото', source: 'extra'
+        });
+      }
+    }
+    return list;
+  }
+
+  /* ==================== IMAGE COMPRESSION + WATERMARK ==================== */
+  function processImageFile(file, addWatermark, gpsText) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = reject;
+        img.onload = () => {
+          const MAX_SIDE = 1280;
+          let w = img.width, h = img.height;
+          if (w > MAX_SIDE || h > MAX_SIDE) {
+            if (w >= h) { h = Math.round(h * (MAX_SIDE / w)); w = MAX_SIDE; }
+            else { w = Math.round(w * (MAX_SIDE / h)); h = MAX_SIDE; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+
+          if (addWatermark) {
+            const d = new Date();
+            const pad = (n) => String(n).padStart(2, '0');
+            const stamp = `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}` + (gpsText ? ` | ${gpsText}` : '');
+            const fs = Math.max(16, Math.round(w * 0.022));
+            ctx.font = `bold ${fs}px sans-serif`;
+            const tw = ctx.measureText(stamp).width;
+            const padX = Math.round(fs * 0.6);
+            const boxH = Math.round(fs * 1.6);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.58)';
+            ctx.fillRect(w - tw - padX * 2 - 10, h - boxH - 10, tw + padX * 2, boxH);
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillText(stamp, w - tw - padX - 10, h - Math.round(boxH * 0.35) - 10);
+          }
+
+          resolve({ dataUrl: canvas.toDataURL('image/jpeg', 0.80), width: w, height: h, ts: Date.now() });
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /* ==================== PHOTO ANNOTATION EDITOR ==================== */
+  const editor = {
+    canvas: null,
+    ctx: null,
+    baseImg: null,
+    tool: 'arrow',
+    color: '#ef4444',
+    shapes: [],
+    drawing: false,
+    currentShape: null,
+    dirty: false,
+
+    init() {
+      this.canvas = document.getElementById('editor-canvas');
+      this.ctx = this.canvas.getContext('2d');
+
+      const getPt = (e) => {
+        const rect = this.canvas.getBoundingClientRect();
+        const t = e.touches ? e.touches[0] : e;
+        const sx = this.canvas.width / rect.width;
+        const sy = this.canvas.height / rect.height;
+        return { x: (t.clientX - rect.left) * sx, y: (t.clientY - rect.top) * sy };
+      };
+
+      const onDown = (e) => {
+        if (!this.baseImg) return;
+        e.preventDefault();
+        this.drawing = true;
+        const p = getPt(e);
+        const lw = Math.max(4, Math.round(Math.max(this.canvas.width, this.canvas.height) * 0.0075));
+        if (this.tool === 'pen') {
+          this.currentShape = { tool: 'pen', color: this.color, lw, points: [p] };
+        } else {
+          this.currentShape = { tool: this.tool, color: this.color, lw, x1: p.x, y1: p.y, x2: p.x, y2: p.y };
+        }
+        this.render();
+      };
+
+      const onMove = (e) => {
+        if (!this.drawing || !this.currentShape) return;
+        e.preventDefault();
+        const p = getPt(e);
+        if (this.currentShape.tool === 'pen') {
+          this.currentShape.points.push(p);
+        } else {
+          this.currentShape.x2 = p.x;
+          this.currentShape.y2 = p.y;
+        }
+        this.render();
+      };
+
+      const onUp = () => {
+        if (!this.drawing || !this.currentShape) return;
+        this.drawing = false;
+        const s = this.currentShape;
+        let valid = false;
+        if (s.tool === 'pen') valid = s.points.length > 1;
+        else valid = Math.hypot(s.x2 - s.x1, s.y2 - s.y1) > 10;
+        if (valid) {
+          this.shapes.push(s);
+          this.dirty = true;
+        }
+        this.currentShape = null;
+        this.render();
+      };
+
+      this.canvas.addEventListener('mousedown', onDown);
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+      this.canvas.addEventListener('touchstart', onDown, { passive: false });
+      this.canvas.addEventListener('touchmove', onMove, { passive: false });
+      window.addEventListener('touchend', onUp);
+    },
+
+    load(dataUrl) {
+      this.shapes = [];
+      this.currentShape = null;
+      this.dirty = false;
+      const img = new Image();
+      img.onload = () => {
+        this.baseImg = img;
+        this.canvas.width = img.width;
+        this.canvas.height = img.height;
+        this.render();
+      };
+      img.src = dataUrl;
+    },
+
+    drawShape(ctx, s) {
+      ctx.save();
+      ctx.strokeStyle = s.color;
+      ctx.fillStyle = s.color;
+      ctx.lineWidth = s.lw;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.shadowColor = 'rgba(0,0,0,0.65)';
+      ctx.shadowBlur = Math.max(3, s.lw * 0.7);
+
+      if (s.tool === 'pen') {
+        ctx.beginPath();
+        s.points.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+        ctx.stroke();
+      } else if (s.tool === 'circle') {
+        const cx = (s.x1 + s.x2) / 2;
+        const cy = (s.y1 + s.y2) / 2;
+        const rx = Math.max(4, Math.abs(s.x2 - s.x1) / 2);
+        const ry = Math.max(4, Math.abs(s.y2 - s.y1) / 2);
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      } else if (s.tool === 'arrow') {
+        const angle = Math.atan2(s.y2 - s.y1, s.x2 - s.x1);
+        const headLen = Math.max(20, s.lw * 4.2);
+        const endX = s.x2 - Math.cos(angle) * (headLen * 0.45);
+        const endY = s.y2 - Math.sin(angle) * (headLen * 0.45);
+        ctx.beginPath();
+        ctx.moveTo(s.x1, s.y1);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(s.x2, s.y2);
+        ctx.lineTo(s.x2 - headLen * Math.cos(angle - Math.PI / 6), s.y2 - headLen * Math.sin(angle - Math.PI / 6));
+        ctx.lineTo(s.x2 - headLen * Math.cos(angle + Math.PI / 6), s.y2 - headLen * Math.sin(angle + Math.PI / 6));
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+    },
+
+    render() {
+      if (!this.baseImg) return;
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.drawImage(this.baseImg, 0, 0);
+      for (const s of this.shapes) this.drawShape(this.ctx, s);
+      if (this.currentShape) this.drawShape(this.ctx, this.currentShape);
+    },
+
+    undo() {
+      if (!this.shapes.length) return;
+      this.shapes.pop();
+      this.dirty = this.shapes.length > 0;
+      this.render();
+    },
+
+    reset() {
+      this.shapes = [];
+      this.dirty = false;
+      this.render();
+    },
+
+    exportDataUrl() {
+      return this.canvas.toDataURL('image/jpeg', 0.84);
+    }
+  };
+
+  /* ==================== SIGNATURE PAD ==================== */
+  function initSignaturePad(canvasId, caseField) {
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+    let drawing = false, lastX = 0, lastY = 0;
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width === 0) return;
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(rect.width * ratio);
+      canvas.height = Math.round(120 * ratio);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      ctx.lineWidth = 2.4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.strokeStyle = '#0f172a';
+      redrawSaved();
+    }
+    function redrawSaved() {
+      const c = getCurrentCase();
+      const dataUrl = c[caseField];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (dataUrl) {
+        const img = new Image();
+        img.onload = () => {
+          const rect = canvas.getBoundingClientRect();
+          ctx.drawImage(img, 0, 0, rect.width || 300, 120);
+        };
+        img.src = dataUrl;
+      }
+    }
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const t = e.touches ? e.touches[0] : e;
+      return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+    }
+    function start(e) {
+      e.preventDefault(); drawing = true;
+      const p = getPos(e); lastX = p.x; lastY = p.y;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 1.2, 0, Math.PI * 2);
+      ctx.fillStyle = '#0f172a'; ctx.fill();
+    }
+    function move(e) {
+      if (!drawing) return; e.preventDefault();
+      const p = getPos(e);
+      ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
+      lastX = p.x; lastY = p.y;
+    }
+    function end() {
+      if (!drawing) return; drawing = false;
+      getCurrentCase()[caseField] = canvas.toDataURL('image/png');
+      scheduleSave(); renderAudit();
+    }
+    canvas.addEventListener('mousedown', start);
+    canvas.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', end);
+    canvas.addEventListener('touchstart', start, { passive: false });
+    canvas.addEventListener('touchmove', move, { passive: false });
+    window.addEventListener('touchend', end);
+
+    return {
+      resize,
+      clear() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        getCurrentCase()[caseField] = '';
+        scheduleSave(); renderAudit();
+      }
+    };
+  }
+
+  let sigPadExpert, sigPadClient;
+
+  /* ==================== RENDERING ==================== */
+  function renderHeader() {
+    const c = getCurrentCase();
+    document.getElementById('hdr-title').textContent = c.carModel ? `${c.carModel} ${c.plate || ''}`.trim() : `Акт № ${c.actNumber || '—'}`;
+    document.getElementById('hdr-sub').textContent = c.vin ? `VIN: ${c.vin}` : 'Автономный осмотр по 755-П • v2.1';
+    document.getElementById('nav-photo-badge').textContent = getAllOrderedPhotos(c).length;
+    document.getElementById('nav-defect-badge').textContent = (c.defects || []).length;
+  }
+
+  function renderProfile() {
+    document.getElementById('prof-name').value = state.profile.name || '';
+    document.getElementById('prof-mak').value = state.profile.mak || '';
+    document.getElementById('prof-phone').value = state.profile.phone || '';
+    document.getElementById('prof-org').value = state.profile.org || '';
+    document.getElementById('prof-city').value = state.profile.city || '';
+  }
+
+  function renderCasesList() {
+    const wrap = document.getElementById('cases-list');
+    const cur = getCurrentCase();
+    if (!state.cases.length) {
+      wrap.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0">Дел пока нет.</div>';
+      return;
+    }
+    wrap.innerHTML = state.cases.map(c => {
+      const isCur = c.id === cur.id;
+      return `
+        <div class="case-card ${isCur ? 'current' : ''}" data-case-id="${c.id}">
+          <div class="case-top">
+            <div class="case-title">${escapeHtml(c.carModel || 'Автомобиль не указан')} ${c.plate ? `<span class="badge badge-info">${escapeHtml(c.plate)}</span>` : ''}</div>
+            ${isCur ? '<span class="badge badge-ok">Активно</span>' : ''}
+          </div>
+          <div class="case-meta">
+            <span>Акт № ${escapeHtml(c.actNumber || '—')}</span>
+            <span>от ${formatDateRU(c.inspectDate)}</span>
+            <span>📸 ${getAllOrderedPhotos(c).length}</span>
+            <span>🔧 ${(c.defects || []).length}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+    wrap.querySelectorAll('.case-card').forEach(el => {
+      el.addEventListener('click', () => {
+        resetDefectDraft();
+        state.currentCaseId = el.dataset.caseId;
+        scheduleSave();
+        renderAll();
+        toast('Открыто дело № ' + (getCurrentCase().actNumber || ''));
+      });
+    });
+  }
+
+  function renderCard() {
+    const c = getCurrentCase();
+    document.getElementById('card-act-badge').textContent = `Акт № ${c.actNumber || '—'}`;
+    document.getElementById('gps-badge').textContent = c.gps ? `GPS: ${c.gps}` : '';
+    document.querySelectorAll('[data-field]').forEach(el => {
+      el.value = c[el.dataset.field] || '';
+    });
+    updateVinUI(c.vin);
+
+    // Equipment chips
+    const eqWrap = document.getElementById('equip-chips');
+    eqWrap.innerHTML = EQUIPMENT_LIST.map(eq => `
+      <button type="button" class="chip ${(c.equipment || []).includes(eq) ? 'active' : ''}" data-eq="${escapeHtml(eq)}">${escapeHtml(eq)}</button>
+    `).join('');
+    eqWrap.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.dataset.eq;
+        c.equipment = c.equipment || [];
+        if (c.equipment.includes(val)) c.equipment = c.equipment.filter(x => x !== val);
+        else c.equipment.push(val);
+        scheduleSave();
+        renderCard();
+      });
+    });
+  }
+
+  function updateVinUI(vin) {
+    const res = validateVIN(vin);
+    const badge = document.getElementById('vin-status');
+    const inp = document.querySelector('[data-field="vin"]');
+    badge.textContent = res.text;
+    badge.className = 'badge ' + (res.state === 'ok' ? 'badge-ok' : res.state === 'err' ? 'badge-err' : 'badge-warn');
+    inp.classList.remove('vin-valid', 'vin-invalid');
+    if (res.state === 'ok') inp.classList.add('vin-valid');
+    else if (res.state === 'err') inp.classList.add('vin-invalid');
+  }
+
+  function renderPhotos() {
+    const c = getCurrentCase();
+    document.getElementById('chk-watermark').checked = !!state.watermark;
+    let filledCount = 0;
+    const mandGrid = document.getElementById('mandatory-photos-grid');
+    mandGrid.innerHTML = MANDATORY_SLOTS.map((slot, idx) => {
+      const ph = c.mandatoryPhotos[slot.id];
+      if (ph && ph.dataUrl) filledCount++;
+      return `
+        <div class="photo-slot ${ph ? 'filled' : ''}">
+          <div class="photo-thumb" data-slot-action="${slot.id}">
+            <span class="photo-num">#${idx + 1}</span>
+            ${ph
+              ? `<img src="${ph.dataUrl}" alt="${escapeHtml(slot.title)}">
+                 <span class="photo-edit-pill">✏ Разметка</span>
+                 <button type="button" class="photo-del" data-del-slot="${slot.id}" title="Удалить">×</button>`
+              : `<div style="font-size:26px">📷</div><div>Снять / выбрать</div>`
+            }
+          </div>
+          <div class="photo-meta">
+            <div>${escapeHtml(ph ? (ph.caption || slot.title) : slot.title)}</div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span class="req-tag">${ph ? '✓ Готово' : 'Обязательно'}</span>
+              <button type="button" class="btn btn-secondary btn-xs" data-gal-slot="${slot.id}">Галерея</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('photo-progress-text').textContent = `${filledCount} / ${MANDATORY_SLOTS.length}`;
+    document.getElementById('photo-progress-bar').style.width = `${Math.round((filledCount / MANDATORY_SLOTS.length) * 100)}%`;
+
+    mandGrid.querySelectorAll('[data-slot-action]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('[data-del-slot]')) return;
+        const slotId = el.dataset.slotAction;
+        const ph = c.mandatoryPhotos[slotId];
+        if (ph) openPhotoModal({ kind: 'slot', slotId, photo: ph });
+        else {
+          activePhotoTarget = { kind: 'slot', slotId };
+          document.getElementById('inp-camera').click();
+        }
+      });
+    });
+    mandGrid.querySelectorAll('[data-gal-slot]').forEach(el => {
+      el.addEventListener('click', () => {
+        activePhotoTarget = { kind: 'slot', slotId: el.dataset.galSlot };
+        document.getElementById('inp-gallery').removeAttribute('multiple');
+        document.getElementById('inp-gallery').click();
+      });
+    });
+    mandGrid.querySelectorAll('[data-del-slot]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        delete c.mandatoryPhotos[el.dataset.delSlot];
+        scheduleSave(); renderPhotos(); renderHeader(); renderAudit();
+      });
+    });
+
+    const extraGrid = document.getElementById('extra-photos-grid');
+    if (!c.extraPhotos.length) {
+      extraGrid.innerHTML = '<div style="grid-column:1/-1;color:var(--muted);font-size:13px">Дополнительных фото пока нет.</div>';
+    } else {
+      extraGrid.innerHTML = c.extraPhotos.map((ph, i) => `
+        <div class="photo-slot filled">
+          <div class="photo-thumb" data-extra-view="${ph.id}">
+            <span class="photo-num">Доп.${i + 1}</span>
+            <img src="${ph.dataUrl}" alt="${escapeHtml(ph.caption)}">
+            <span class="photo-edit-pill">✏ Разметка</span>
+            <button type="button" class="photo-del" data-del-extra="${ph.id}">×</button>
+          </div>
+          <div class="photo-meta">${escapeHtml(ph.caption || 'Дополнительное фото')}</div>
+        </div>
+      `).join('');
+
+      extraGrid.querySelectorAll('[data-extra-view]').forEach(el => {
+        el.addEventListener('click', (e) => {
+          if (e.target.closest('[data-del-extra]')) return;
+          const ph = c.extraPhotos.find(x => x.id === el.dataset.extraView);
+          if (ph) openPhotoModal({ kind: 'extra', id: ph.id, photo: ph });
+        });
+      });
+      extraGrid.querySelectorAll('[data-del-extra]').forEach(el => {
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          c.extraPhotos = c.extraPhotos.filter(x => x.id !== el.dataset.delExtra);
+          scheduleSave(); renderPhotos(); renderHeader(); renderAudit();
+        });
+      });
+    }
+  }
+
+  function renderPartGrids() {
+    const c = getCurrentCase();
+    const damaged = new Set((c.defects || []).map(d => (d.part || '').toLowerCase()));
+    const currentPart = document.getElementById('def-part').value.trim().toLowerCase();
+
+    const buildGrid = (containerId, list) => {
+      const wrap = document.getElementById(containerId);
+      wrap.innerHTML = list.map(name => {
+        const low = name.toLowerCase();
+        const isDam = damaged.has(low);
+        const isSel = currentPart === low;
+        return `<button type="button" class="part-btn ${isDam ? 'damaged' : ''} ${isSel ? 'selected' : ''}" data-pick-part="${escapeHtml(name)}">
+          <span>${escapeHtml(name)}</span>${isDam ? '<span>●</span>' : ''}
+        </button>`;
+      }).join('');
+      wrap.querySelectorAll('[data-pick-part]').forEach(btn => {
+        btn.addEventListener('click', () => selectPartFromSchema(btn.dataset.pickPart));
+      });
+    };
+
+    buildGrid('grid-underhood', UNDERHOOD_PARTS);
+    buildGrid('grid-salon', SALON_SRS_PARTS);
+    buildGrid('grid-tires', TIRE_WHEEL_PARTS);
+
+    // Highlight SVG zones
+    document.querySelectorAll('.car-zone').forEach(z => {
+      const low = (z.dataset.part || '').toLowerCase();
+      z.classList.toggle('damaged', damaged.has(low));
+      z.classList.toggle('selected', currentPart === low);
+    });
+  }
+
+  function selectPartFromSchema(partName) {
+    document.getElementById('def-part').value = partName;
+    document.getElementById('selected-zone-badge').textContent = partName;
+    renderPartGrids();
+    document.getElementById('defect-form-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function renderDefectBuilderChips() {
+    // Relation chips
+    const relWrap = document.getElementById('def-rel-chips');
+    relWrap.innerHTML = DEFECT_RELATIONS.map(r => `
+      <button type="button" class="chip ${r.cls} ${draftDefect.relation === r.id ? 'active' : ''}" data-drel="${r.id}">${escapeHtml(r.label)}</button>
+    `).join('');
+    relWrap.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        draftDefect.relation = btn.dataset.drel;
+        renderDefectBuilderChips();
+      });
+    });
+
+    // LKP presets
+    const lkpWrap = document.getElementById('def-lkp-presets');
+    lkpWrap.innerHTML = LKP_PRESETS.map(p => `
+      <button type="button" class="chip lkp-chip" data-lkp-val="${escapeHtml(p)}">${escapeHtml(p)}</button>
+    `).join('');
+    lkpWrap.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById('def-lkp').value = btn.dataset.lkpVal;
+      });
+    });
+
+    // Damage types
+    const tWrap = document.getElementById('def-type-chips');
+    tWrap.innerHTML = DAMAGE_TYPES.map(t => `
+      <button type="button" class="chip ${draftDefect.types.includes(t) ? 'active' : ''}" data-dtype="${escapeHtml(t)}">${escapeHtml(t)}</button>
+    `).join('');
+    tWrap.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.dataset.dtype;
+        if (draftDefect.types.includes(val)) draftDefect.types = draftDefect.types.filter(x => x !== val);
+        else draftDefect.types.push(val);
+        renderDefectBuilderChips();
+      });
+    });
+
+    // Action codes
+    const cWrap = document.getElementById('def-code-chips');
+    cWrap.innerHTML = ACTION_CODES.map(item => `
+      <button type="button" class="chip code-chip ${draftDefect.codes.includes(item.code) ? 'active' : ''}" data-dcode="${item.code}">${escapeHtml(item.label)}</button>
+    `).join('');
+    cWrap.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.dataset.dcode;
+        if (draftDefect.codes.includes(val)) draftDefect.codes = draftDefect.codes.filter(x => x !== val);
+        else draftDefect.codes.push(val);
+        renderDefectBuilderChips();
+      });
+    });
+
+    // Quick phrases
+    const qWrap = document.getElementById('quick-phrases');
+    qWrap.innerHTML = QUICK_PHRASES.map(ph => `
+      <button type="button" class="chip phrase-chip" data-phrase="${escapeHtml(ph)}">+ ${escapeHtml(ph)}</button>
+    `).join('');
+    qWrap.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const ta = document.getElementById('def-desc');
+        const cur = ta.value.trim();
+        const phrase = btn.dataset.phrase;
+        if (!cur) ta.value = phrase.charAt(0).toUpperCase() + phrase.slice(1);
+        else if (cur.endsWith(',') || cur.endsWith('.')) ta.value = cur + ' ' + phrase;
+        else ta.value = cur + ', ' + phrase;
+        ta.focus();
+      });
+    });
+
+    // Draft photos (clickable for arrow annotation!)
+    const strip = document.getElementById('def-draft-photos');
+    strip.innerHTML = draftDefect.photos.map((p, idx) => `
+      <div style="position:relative">
+        <img src="${p.dataUrl}" data-edit-draft-ph="${idx}" alt="Фото дефекта" title="Нажмите для разметки стрелками">
+        <button type="button" class="photo-del" style="width:20px;height:20px;font-size:12px;top:-4px;right:-4px" data-rm-draft-ph="${idx}">×</button>
+      </div>
+    `).join('');
+    strip.querySelectorAll('[data-edit-draft-ph]').forEach(img => {
+      img.addEventListener('click', () => {
+        const idx = Number(img.dataset.editDraftPh);
+        const ph = draftDefect.photos[idx];
+        if (ph) openPhotoModal({ kind: 'defectDraft', idx, photo: ph });
+      });
+    });
+    strip.querySelectorAll('[data-rm-draft-ph]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        draftDefect.photos.splice(Number(btn.dataset.rmDraftPh), 1);
+        renderDefectBuilderChips();
+      });
+    });
+
+    // Editing mode UI state
+    const isEditing = !!draftDefect.editingId;
+    document.getElementById('defect-form-card').classList.toggle('editing-card', isEditing);
+    document.getElementById('defect-form-title').textContent = isEditing ? '✏ Редактирование повреждения' : '🔧 Добавить повреждение';
+    document.getElementById('btn-cancel-edit').style.display = isEditing ? 'inline-flex' : 'none';
+    const submitBtn = document.getElementById('btn-add-defect');
+    submitBtn.textContent = isEditing ? '💾 Сохранить изменения' : '+ Внести повреждение в Акт';
+    submitBtn.className = 'btn btn-full ' + (isEditing ? 'btn-success' : 'btn-primary');
+  }
+
+  function resetDefectDraft() {
+    draftDefect = { editingId: null, relation: 'dtp', types: [], codes: [], photos: [] };
+    document.getElementById('def-part').value = '';
+    document.getElementById('def-lkp').value = '';
+    document.getElementById('def-desc').value = '';
+    document.getElementById('selected-zone-badge').textContent = 'Выберите деталь';
+    renderPartGrids();
+    renderDefectBuilderChips();
+  }
+
+  function startEditDefect(defectId) {
+    const c = getCurrentCase();
+    const d = c.defects.find(x => x.id === defectId);
+    if (!d) return;
+    draftDefect = {
+      editingId: d.id,
+      relation: d.relation || 'dtp',
+      types: [...(d.types || [])],
+      codes: [...(d.codes || [])],
+      photos: (d.photos || []).map(p => ({ ...p }))
+    };
+    document.getElementById('def-part').value = d.part || '';
+    document.getElementById('def-lkp').value = d.lkp || '';
+    document.getElementById('def-desc').value = d.desc || '';
+    document.getElementById('selected-zone-badge').textContent = d.part || 'Редактирование';
+    renderPartGrids();
+    renderDefectBuilderChips();
+    document.getElementById('defect-form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    toast('Режим редактирования детали');
+  }
+
+  function renderDefects() {
+    const c = getCurrentCase();
+    document.getElementById('defects-count-badge').textContent = `${c.defects.length} шт.`;
+    document.getElementById('chk-hidden-damages').checked = !!c.hiddenDamagesClause;
+    renderPartGrids();
+
+    const list = document.getElementById('defects-list');
+    if (!c.defects.length) {
+      list.innerHTML = '<div style="color:var(--muted);font-size:13px">Повреждения пока не добавлены. Выберите деталь на схеме выше.</div>';
+      return;
+    }
+    list.innerHTML = c.defects.map((d, idx) => {
+      const rel = getRelMeta(d.relation);
+      const borderCls = d.relation === 'pre' ? 'is-pre' : d.relation === 'old' ? 'is-old' : '';
+      return `
+        <div class="defect-item ${borderCls}">
+          <div class="defect-head">
+            <div class="defect-title">${idx + 1}. ${escapeHtml(d.part)}</div>
+            <div class="defect-actions">
+              <button type="button" class="btn btn-secondary btn-xs" data-edit-defect="${d.id}">✏ Изменить</button>
+              <button type="button" class="btn btn-danger btn-xs" data-del-defect="${d.id}">✕</button>
+            </div>
+          </div>
+          <div class="chips" style="margin-bottom:6px">
+            <span class="badge ${rel.badgeCls}">${escapeHtml(rel.label)}</span>
+            ${(d.types || []).map(t => `<span class="badge badge-info">${escapeHtml(t)}</span>`).join('')}
+            ${(d.codes || []).map(cd => `<span class="badge badge-ok">${escapeHtml(cd)}</span>`).join('')}
+          </div>
+          ${d.lkp ? `<div class="defect-meta-line">📏 Толщина ЛКП: ${escapeHtml(d.lkp)}</div>` : ''}
+          ${d.desc ? `<div class="defect-desc">${escapeHtml(d.desc)}</div>` : ''}
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+            <button type="button" class="btn btn-secondary btn-xs" data-add-def-photo="${d.id}">📷 + Фото к детали</button>
+            <span style="font-size:12px;color:var(--muted)">Фото: ${(d.photos || []).length} шт. (тап — стрелки)</span>
+          </div>
+          ${(d.photos && d.photos.length) ? `
+            <div class="defect-photos-strip">
+              ${d.photos.map(ph => `<img src="${ph.dataUrl}" data-view-def-ph="${d.id}|${ph.id}" alt="Фото">`).join('')}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }).join('');
+
+    list.querySelectorAll('[data-edit-defect]').forEach(btn => {
+      btn.addEventListener('click', () => startEditDefect(btn.dataset.editDefect));
+    });
+    list.querySelectorAll('[data-del-defect]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.delDefect;
+        c.defects = c.defects.filter(x => x.id !== id);
+        if (draftDefect.editingId === id) resetDefectDraft();
+        scheduleSave(); renderDefects(); renderHeader(); renderAudit();
+      });
+    });
+    list.querySelectorAll('[data-add-def-photo]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activePhotoTarget = { kind: 'defectExisting', defectId: btn.dataset.addDefPhoto };
+        document.getElementById('inp-camera').click();
+      });
+    });
+    list.querySelectorAll('[data-view-def-ph]').forEach(img => {
+      img.addEventListener('click', () => {
+        const [did, pid] = img.dataset.viewDefPh.split('|');
+        const def = c.defects.find(x => x.id === did);
+        const ph = def && (def.photos || []).find(p => p.id === pid);
+        if (ph) openPhotoModal({ kind: 'defect', defectId: did, id: pid, photo: ph });
+      });
+    });
+  }
+
+  function renderAudit() {
+    const c = getCurrentCase();
+    const vinOk = validateVIN(c.vin).state === 'ok';
+    const mandCount = Object.keys(c.mandatoryPhotos || {}).filter(k => c.mandatoryPhotos[k]?.dataUrl).length;
+    const totalPh = getAllOrderedPhotos(c).length;
+    const dateOrderBad = !!(c.dtpDate && c.inspectDate && c.inspectDate < c.dtpDate);
+    const paintWarnParts = (c.defects || []).filter(d => {
+      const hasReplaceOrRepair = (d.codes || []).some(cd => ['З', 'Р1', 'Р2', 'Р3'].includes(cd));
+      const isPaintedBody = /(бампер|капот|крыло|дверь|порог|крыша|багажник)/i.test(d.part || '');
+      const hasPaint = (d.codes || []).includes('О');
+      return isPaintedBody && hasReplaceOrRepair && !hasPaint && d.relation === 'dtp';
+    });
+    const srsDefects = (c.defects || []).filter(d => /(SRS|подушка|ремень|шторка)/i.test(d.part || ''));
+    const preCount = (c.defects || []).filter(d => d.relation !== 'dtp').length;
+
+    const items = [
+      { label: 'Профиль эксперта (ФИО и № МАК)', ok: !!(state.profile.name && state.profile.mak), val: state.profile.name ? `МАК №${state.profile.mak || '—'}` : 'Не заполнен' },
+      { label: 'Марка, модель и госномер ТС', ok: !!(c.carModel && c.plate), val: c.carModel ? `${c.carModel}` : 'Нет данных' },
+      { label: 'Корректный VIN (17 знаков)', ok: vinOk, val: c.vin ? `${c.vin.length}/17` : 'Пусто' },
+      { label: 'Даты ДТП и осмотра логичны', ok: !dateOrderBad, err: dateOrderBad, val: dateOrderBad ? 'Осмотр раньше ДТП!' : 'ОК' },
+      { label: 'Пробег ТС зафиксирован', ok: !!c.mileage, val: c.mileage ? `${c.mileage} км` : 'Не указан' },
+      { label: 'Обязательные фото 755-П', ok: mandCount >= 8, val: `${mandCount} / ${MANDATORY_SLOTS.length} (всего ${totalPh})` },
+      { label: 'Список повреждений деталей', ok: c.defects.length > 0, val: `${c.defects.length} поз.${preCount ? ` (доавар.: ${preCount})` : ''}` },
+      { label: 'Окраска «О» для кузовных деталей', ok: paintWarnParts.length === 0, val: paintWarnParts.length ? `Проверьте: ${paintWarnParts.length} дет.` : 'ОК' },
+      { label: 'Подписи эксперта и заказчика', ok: !!(c.sigExpert && c.sigClient), val: (c.sigExpert ? 'Эксп.✓ ' : 'Эксп.— ') + (c.sigClient ? 'Зак.✓' : 'Зак.—') }
+    ];
+    if (srsDefects.length) {
+      items.push({ label: 'Элементы безопасности (SRS)', ok: true, val: `${srsDefects.length} шт. (износ 0%)` });
+    }
+
+    document.getElementById('audit-list').innerHTML = items.map(it => `
+      <div class="audit-row">
+        <span>${it.err ? '🔴' : it.ok ? '🟢' : '🟡'} ${escapeHtml(it.label)}</span>
+        <span class="badge ${it.err ? 'badge-err' : it.ok ? 'badge-ok' : 'badge-warn'}">${escapeHtml(it.val)}</span>
+      </div>
+    `).join('');
+  }
+
+  function renderAll() {
+    renderHeader();
+    renderProfile();
+    renderCasesList();
+    renderCard();
+    renderPhotos();
+    renderDefectBuilderChips();
+    renderDefects();
+    renderAudit();
+    document.getElementById('sel-photo-layout').value = state.photoLayout || '2';
+    if (sigPadExpert) sigPadExpert.resize();
+    if (sigPadClient) sigPadClient.resize();
+  }
+
+  /* ==================== MODAL ==================== */
+  function openPhotoModal(ref) {
+    modalPhotoRef = ref;
+    document.getElementById('modal-caption').value = ref.photo.caption || '';
+    document.getElementById('photo-modal').classList.add('open');
+    editor.load(ref.photo.dataUrl);
+  }
+  function closePhotoModal() {
+    modalPhotoRef = null;
+    document.getElementById('photo-modal').classList.remove('open');
+  }
+
+  /* ==================== PURE-JS ZIP WRITER (STORE, NO DEPS) ==================== */
+  const CRC_TABLE = (() => {
+    const t = new Uint32Array(256);
+    for (let i = 0; i < 256; i++) {
+      let c = i;
+      for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      t[i] = c >>> 0;
+    }
+    return t;
+  })();
+
+  function crc32(bytes) {
+    let crc = 0xFFFFFFFF;
+    for (let i = 0; i < bytes.length; i++) crc = CRC_TABLE[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8);
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+  }
+  function utf8Bytes(str) { return new TextEncoder().encode(str); }
+  function dataUrlToBytes(dataUrl) {
+    const idx = dataUrl.indexOf(',');
+    const b64 = idx >= 0 ? dataUrl.slice(idx + 1) : dataUrl;
+    const bin = atob(b64);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+
+  function createZipBlob(files, mimeType) {
+    const localParts = [], centralParts = [];
+    let offset = 0;
+    const now = new Date();
+    const dosTime = ((now.getHours() & 31) << 11) | ((now.getMinutes() & 63) << 5) | ((now.getSeconds() >> 1) & 31);
+    const dosDate = (((Math.max(1980, now.getFullYear()) - 1980) & 127) << 9) | (((now.getMonth() + 1) & 15) << 5) | (now.getDate() & 31);
+
+    for (const f of files) {
+      const nameBytes = utf8Bytes(f.name);
+      const data = f.data instanceof Uint8Array ? f.data : utf8Bytes(String(f.data));
+      const crc = crc32(data), len = data.length;
+
+      const lh = new ArrayBuffer(30 + nameBytes.length);
+      const lv = new DataView(lh);
+      lv.setUint32(0, 0x04034b50, true); lv.setUint16(4, 20, true);
+      lv.setUint16(6, 0x0800, true);     lv.setUint16(8, 0, true);
+      lv.setUint16(10, dosTime, true);   lv.setUint16(12, dosDate, true);
+      lv.setUint32(14, crc, true);       lv.setUint32(18, len, true);
+      lv.setUint32(22, len, true);       lv.setUint16(26, nameBytes.length, true);
+      lv.setUint16(28, 0, true);
+      new Uint8Array(lh, 30).set(nameBytes);
+      localParts.push(new Uint8Array(lh), data);
+
+      const ch = new ArrayBuffer(46 + nameBytes.length);
+      const cv = new DataView(ch);
+      cv.setUint32(0, 0x02014b50, true); cv.setUint16(4, 20, true);
+      cv.setUint16(6, 20, true);         cv.setUint16(8, 0x0800, true);
+      cv.setUint16(10, 0, true);         cv.setUint16(12, dosTime, true);
+      cv.setUint16(14, dosDate, true);   cv.setUint32(16, crc, true);
+      cv.setUint32(20, len, true);       cv.setUint32(24, len, true);
+      cv.setUint16(28, nameBytes.length, true);
+      cv.setUint32(42, offset, true);
+      new Uint8Array(ch, 46).set(nameBytes);
+      centralParts.push(new Uint8Array(ch));
+      offset += 30 + nameBytes.length + len;
+    }
+
+    let cdSize = 0;
+    for (const part of centralParts) cdSize += part.length;
+
+    const eocd = new ArrayBuffer(22);
+    const ev = new DataView(eocd);
+    ev.setUint32(0, 0x06054b50, true);
+    ev.setUint16(8, files.length, true); ev.setUint16(10, files.length, true);
+    ev.setUint32(12, cdSize, true);      ev.setUint32(16, offset, true);
+    return new Blob([...localParts, ...centralParts, new Uint8Array(eocd)], { type: mimeType });
+  }
+
+  /* ==================== PURE-JS DOCX BUILDER (OOXML) ==================== */
+  function xmlEsc(s) {
+    return String(s ?? '')
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+  }
+
+  function wParagraph(text, opts = {}) {
+    const jc = opts.align ? `<w:jc w:val="${opts.align}"/>` : '';
+    const sp = `<w:spacing w:before="${opts.before ?? 0}" w:after="${opts.after ?? 70}" w:line="240" w:lineRule="auto"/>`;
+    const pb = opts.pageBreakBefore ? '<w:pageBreakBefore/>' : '';
+    const keep = opts.keepNext ? '<w:keepNext/>' : '';
+    const bold = opts.bold ? '<w:b/>' : '';
+    const italic = opts.italic ? '<w:i/>' : '';
+    const sz = `<w:sz w:val="${opts.size || 20}"/><w:szCs w:val="${opts.size || 20}"/>`;
+    const color = opts.color ? `<w:color w:val="${opts.color}"/>` : '';
+    const runs = String(text ?? '').split('\n').map((line, i) =>
+      `${i > 0 ? '<w:br/>' : ''}<w:t xml:space="preserve">${xmlEsc(line)}</w:t>`
+    ).join('');
+    return `<w:p><w:pPr>${pb}${keep}${sp}${jc}</w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/>${bold}${italic}${sz}${color}</w:rPr>${runs}</w:r></w:p>`;
+  }
+
+  function wDrawingParagraph(rId, docPrId, widthEmu, heightEmu, align = 'center') {
+    return `<w:p><w:pPr><w:spacing w:before="30" w:after="30"/><w:jc w:val="${align}"/></w:pPr><w:r><w:drawing>` +
+      `<wp:inline distT="0" distB="0" distL="0" distR="0">` +
+      `<wp:extent cx="${widthEmu}" cy="${heightEmu}"/>` +
+      `<wp:effectExtent l="0" t="0" r="0" b="0"/>` +
+      `<wp:docPr id="${docPrId}" name="Img_${docPrId}"/>` +
+      `<wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr>` +
+      `<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">` +
+      `<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">` +
+      `<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">` +
+      `<pic:nvPicPr><pic:cNvPr id="${docPrId}" name="Img_${docPrId}"/><pic:cNvPicPr/></pic:nvPicPr>` +
+      `<pic:blipFill><a:blip r:embed="${rId}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>` +
+      `<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${widthEmu}" cy="${heightEmu}"/></a:xfrm>` +
+      `<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>` +
+      `</pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`;
+  }
+
+  function wCell(innerXml, widthTwips, opts = {}) {
+    const shade = opts.fill ? `<w:shd w:val="clear" w:color="auto" w:fill="${opts.fill}"/>` : '';
+    const vAlign = opts.vAlign ? `<w:vAlign w:val="${opts.vAlign}"/>` : '';
+    const span = opts.gridSpan ? `<w:gridSpan w:val="${opts.gridSpan}"/>` : '';
+    return `<w:tc><w:tcPr><w:tcW w:w="${widthTwips}" w:type="dxa"/>${span}${shade}${vAlign}` +
+      `<w:tcMar><w:top w:w="65" w:type="dxa"/><w:left w:w="90" w:type="dxa"/><w:bottom w:w="65" w:type="dxa"/><w:right w:w="90" w:type="dxa"/></w:tcMar>` +
+      `</w:tcPr>${innerXml}</w:tc>`;
+  }
+
+  function wTable(rowsXml, colWidths, bordered = true) {
+    const borders = bordered
+      ? `<w:tblBorders><w:top w:val="single" w:sz="6" w:space="0" w:color="444444"/><w:left w:val="single" w:sz="6" w:space="0" w:color="444444"/><w:bottom w:val="single" w:sz="6" w:space="0" w:color="444444"/><w:right w:val="single" w:sz="6" w:space="0" w:color="444444"/><w:insideH w:val="single" w:sz="4" w:space="0" w:color="666666"/><w:insideV w:val="single" w:sz="4" w:space="0" w:color="666666"/></w:tblBorders>`
+      : `<w:tblBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/><w:insideH w:val="none"/><w:insideV w:val="none"/></w:tblBorders>`;
+    const totalW = colWidths.reduce((a, b) => a + b, 0);
+    const grid = colWidths.map(w => `<w:gridCol w:w="${w}"/>`).join('');
+    return `<w:tbl><w:tblPr><w:tblW w:w="${totalW}" w:type="dxa"/><w:tblLayout w:type="fixed"/>${borders}</w:tblPr><w:tblGrid>${grid}</w:tblGrid>${rowsXml}</w:tbl>`;
+  }
+
+  function formatTireSummary(c) {
+    const parts = [];
+    if (c.tireBrand) parts.push(c.tireBrand);
+    if (c.tireSize) parts.push(c.tireSize);
+    if (c.tireSeason) parts.push(c.tireSeason);
+    if (c.diskType) parts.push(`диски: ${c.diskType}`);
+    const tr = [
+      c.treadFL ? `ПЛ ${c.treadFL}мм` : '',
+      c.treadFR ? `ПП ${c.treadFR}мм` : '',
+      c.treadRL ? `ЗЛ ${c.treadRL}мм` : '',
+      c.treadRR ? `ЗП ${c.treadRR}мм` : ''
+    ].filter(Boolean);
+    if (tr.length) parts.push(`протектор: ${tr.join(', ')}`);
+    return parts.join('; ');
+  }
+
+  function buildDocxBlob(c) {
+    const zipFiles = [];
+    const rels = [
+      `<Relationship Id="rIdStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>`
+    ];
+    let relCounter = 1, docPrCounter = 1;
+
+    function addMedia(dataUrl, ext) {
+      const id = `rIdImg${relCounter++}`;
+      const fname = `media/image_${relCounter}.${ext}`;
+      zipFiles.push({ name: `word/${fname}`, data: dataUrlToBytes(dataUrl) });
+      rels.push(`<Relationship Id="${id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="${fname}"/>`);
+      return id;
+    }
+
+    const body = [];
+    const W = 10206;
+
+    if (state.profile.org) body.push(wParagraph(state.profile.org, { align: 'center', bold: true, size: 22, after: 40 }));
+    body.push(wParagraph(`АКТ ОСМОТРА ТРАНСПОРТНОГО СРЕДСТВА № ${c.actNumber || '____'}`, { align: 'center', bold: true, size: 26, before: 40, after: 40 }));
+    body.push(wParagraph('(составлен в соответствии с Положением Банка России от 04.03.2021 № 755-П)', { align: 'center', italic: true, size: 18, after: 120 }));
+
+    const metaRows = [
+      ['Дата и время осмотра', `${formatDateRU(c.inspectDate)}, начало в ${c.inspectTime || '__:__'}`, 'Дата ДТП', formatDateRU(c.dtpDate)],
+      ['Место осмотра', `${c.address || '—'}${c.gps ? ` (GPS: ${c.gps})` : ''}`, 'Полис ОСАГО / СК', `${c.insurer || '—'}${c.policy ? ', ' + c.policy : ''}`],
+      ['Эксперт-техник', `${state.profile.name || '________________'}${state.profile.mak ? `, реестр МАК № ${state.profile.mak}` : ''}`, 'Заказчик / Собственник', `${c.ownerName || '—'}${c.ownerPhone ? ', тел. ' + c.ownerPhone : ''}`],
+      ['Условия осмотра', `Освещение: ${c.lighting}; Погода: ${c.weather}; Кузов: ${c.cleanliness}; Приборы: ${c.ignition}`, 'Присутствующие лица', c.presentPersons || '—']
+    ];
+    body.push(wTable(metaRows.map(r =>
+      `<w:tr><w:trPr><w:cantSplit/></w:trPr>` +
+      wCell(wParagraph(r[0], { bold: true, size: 17, after: 0 }), 1900, { fill: 'EAEFF5' }) +
+      wCell(wParagraph(r[1], { size: 17, after: 0 }), 3203) +
+      wCell(wParagraph(r[2], { bold: true, size: 17, after: 0 }), 1900, { fill: 'EAEFF5' }) +
+      wCell(wParagraph(r[3], { size: 17, after: 0 }), 3203) + `</w:tr>`
+    ).join(''), [1900, 3203, 1900, 3203], true));
+
+    // Section 1: Vehicle info
+    body.push(wParagraph('1. Идентификационные данные и комплектация ТС', { bold: true, size: 22, before: 140, after: 50, keepNext: true }));
+    const carRows = [
+      ['Марка, модель', c.carModel || '—', 'Гос. рег. знак', c.plate || '—'],
+      ['VIN / № кузова', c.vin || '—', 'Год выпуска', c.year || '—'],
+      ['Пробег (одометр)', c.mileage ? `${c.mileage} км` : '—', 'Цвет кузова', c.color || '—'],
+      ['СТС / ПТС', c.sts || '—', 'Тип кузова / КПП', c.bodyType || '—'],
+      ['Состояние до ДТП', c.condition || '—', 'Всего фото', `${getAllOrderedPhotos(c).length} шт.`]
+    ];
+    let carXml = carRows.map(r =>
+      `<w:tr><w:trPr><w:cantSplit/></w:trPr>` +
+      wCell(wParagraph(r[0], { bold: true, size: 17, after: 0 }), 2000, { fill: 'EAEFF5' }) +
+      wCell(wParagraph(r[1], { size: 17, after: 0 }), 3103) +
+      wCell(wParagraph(r[2], { bold: true, size: 17, after: 0 }), 2000, { fill: 'EAEFF5' }) +
+      wCell(wParagraph(r[3], { size: 17, after: 0 }), 3103) + `</w:tr>`
+    ).join('');
+
+    if (c.equipment && c.equipment.length) {
+      carXml += `<w:tr><w:trPr><w:cantSplit/></w:trPr>` +
+        wCell(wParagraph('Комплектация (опции)', { bold: true, size: 17, after: 0 }), 2000, { fill: 'EAEFF5' }) +
+        wCell(wParagraph(c.equipment.join(', '), { size: 17, after: 0 }), 8206, { gridSpan: 3 }) + `</w:tr>`;
+    }
+    const tireSum = formatTireSummary(c);
+    if (tireSum) {
+      carXml += `<w:tr><w:trPr><w:cantSplit/></w:trPr>` +
+        wCell(wParagraph('Шины и диски', { bold: true, size: 17, after: 0 }), 2000, { fill: 'EAEFF5' }) +
+        wCell(wParagraph(tireSum, { size: 17, after: 0 }), 8206, { gridSpan: 3 }) + `</w:tr>`;
+    }
+    body.push(wTable(carXml, [2000, 3103, 2000, 3103], true));
+
+    // Section 2: Damages (with LKP and Pre-accident status)
+    body.push(wParagraph('2. Перечень выявленных повреждений, замеров ЛКП и ремонтных воздействий', { bold: true, size: 22, before: 140, after: 50, keepNext: true }));
+    const defCols = [520, 2250, 4036, 1500, 1900];
+    let defXml = `<w:tr><w:trPr><w:tblHeader/><w:cantSplit/></w:trPr>` +
+      wCell(wParagraph('№', { bold: true, align: 'center', size: 17, after: 0 }), defCols[0], { fill: 'DCE6F2' }) +
+      wCell(wParagraph('Деталь / узел', { bold: true, size: 17, after: 0 }), defCols[1], { fill: 'DCE6F2' }) +
+      wCell(wParagraph('Характер, описание и статус', { bold: true, size: 17, after: 0 }), defCols[2], { fill: 'DCE6F2' }) +
+      wCell(wParagraph('ЛКП (мкм)', { bold: true, align: 'center', size: 17, after: 0 }), defCols[3], { fill: 'DCE6F2' }) +
+      wCell(wParagraph('Воздействия', { bold: true, align: 'center', size: 17, after: 0 }), defCols[4], { fill: 'DCE6F2' }) +
+      `</w:tr>`;
+
+    if (!c.defects.length) {
+      defXml += `<w:tr>` + wCell(wParagraph('Повреждения не зафиксированы.', { italic: true, size: 17, after: 0 }), W, { gridSpan: 5 }) + `</w:tr>`;
+    } else {
+      c.defects.forEach((d, i) => {
+        const rel = getRelMeta(d.relation);
+        const descParts = [];
+        if (d.types && d.types.length) descParts.push(d.types.join(', '));
+        if (d.desc) descParts.push(d.desc);
+        let descCellXml = wParagraph(descParts.join('. ') || '—', { size: 17, after: d.relation !== 'dtp' ? 30 : 0 });
+        if (d.relation !== 'dtp') {
+          descCellXml += wParagraph(`Статус: ${rel.docText}`, { bold: true, italic: true, size: 16, color: d.relation === 'pre' ? 'B45309' : '6B21A8', after: 0 });
+        }
+        const rowFill = d.relation === 'pre' ? 'FFFBEB' : d.relation === 'old' ? 'FAF5FF' : '';
+        defXml += `<w:tr><w:trPr><w:cantSplit/></w:trPr>` +
+          wCell(wParagraph(String(i + 1), { align: 'center', size: 17, after: 0 }), defCols[0], { fill: rowFill }) +
+          wCell(wParagraph(d.part || '—', { bold: true, size: 17, after: 0 }), defCols[1], { fill: rowFill }) +
+          wCell(descCellXml, defCols[2], { fill: rowFill }) +
+          wCell(wParagraph(d.lkp || '—', { align: 'center', size: 16, after: 0 }), defCols[3], { fill: rowFill }) +
+          wCell(wParagraph((d.codes || []).join(', ') || '—', { align: 'center', bold: true, size: 17, after: 0 }), defCols[4], { fill: rowFill }) +
+          `</w:tr>`;
+      });
+    }
+    body.push(wTable(defXml, defCols, true));
+    body.push(wParagraph('Коды воздействий: З — замена; Р1/Р2/Р3 — ремонт 1/2/3 ст.; О — окраска; С/У — снятие/установка; СКР — возможны скрытые повреждения; П — проверка геометрии.', { italic: true, size: 15, before: 40, after: 60 }));
+
+    if (c.hiddenDamagesClause) {
+      body.push(wParagraph('ВНИМАНИЕ: В зоне удара и сопряжённых узлах возможны скрытые повреждения, выявление которых возможно при проведении дефектовки (разборки) ТС в условиях СТОА.', { bold: true, size: 17, before: 30, after: 60 }));
+    }
+    if (c.notes) {
+      body.push(wParagraph(`Особые отметки и пояснения: ${c.notes}`, { size: 17, before: 30, after: 80 }));
+    }
+
+    // Signatures
+    let expSigXml = wParagraph('Эксперт-техник:', { bold: true, size: 18, after: 40 });
+    expSigXml += c.sigExpert
+      ? wDrawingParagraph(addMedia(c.sigExpert, 'png'), docPrCounter++, 1620000, 580000, 'left')
+      : wParagraph('________________________', { size: 18, before: 120, after: 20 });
+    expSigXml += wParagraph(`/ ${state.profile.name || '___________________'} /`, { size: 18, after: 0 });
+
+    let cliSigXml = wParagraph('Заказчик / Собственник (с актом ознакомлен):', { bold: true, size: 18, after: 40 });
+    cliSigXml += c.sigClient
+      ? wDrawingParagraph(addMedia(c.sigClient, 'png'), docPrCounter++, 1620000, 580000, 'left')
+      : wParagraph('________________________', { size: 18, before: 120, after: 20 });
+    cliSigXml += wParagraph(`/ ${c.ownerName || '___________________'} /`, { size: 18, after: 0 });
+
+    body.push(wParagraph('', { before: 60, after: 0 }));
+    body.push(wTable(`<w:tr><w:trPr><w:cantSplit/></w:trPr>${wCell(expSigXml, 5103, { vAlign: 'bottom' })}${wCell(cliSigXml, 5103, { vAlign: 'bottom' })}</w:tr>`, [5103, 5103], false));
+
+    // Photo Table
+    const photos = getAllOrderedPhotos(c);
+    if (photos.length > 0) {
+      const compact = state.photoLayout === 'compact';
+      const maxW = compact ? 2700000 : 3024000;
+      const maxH = compact ? 1850000 : 2448000;
+
+      body.push(wParagraph(`ПРИЛОЖЕНИЕ № 1. ФОТОТАБЛИЦА К АКТУ ОСМОТРА № ${c.actNumber || '____'}`, { align: 'center', bold: true, size: 24, pageBreakBefore: true, after: 40 }));
+      body.push(wParagraph(`ТС: ${c.carModel || '—'}, гос. знак: ${c.plate || '—'}, VIN: ${c.vin || '—'}, дата осмотра: ${formatDateRU(c.inspectDate)}`, { align: 'center', italic: true, size: 17, after: 100 }));
+
+      let phRowsXml = '';
+      for (let i = 0; i < photos.length; i += 2) {
+        const pair = [photos[i], photos[i + 1]];
+        const cells = pair.map(ph => {
+          if (!ph) return wCell(wParagraph('', { after: 0 }), 5103);
+          const ext = ph.dataUrl.startsWith('data:image/png') ? 'png' : 'jpg';
+          const rId = addMedia(ph.dataUrl, ext);
+          const ratio = (ph.height || 900) / (ph.width || 1200);
+          let wEmu = maxW, hEmu = Math.round(maxW * ratio);
+          if (hEmu > maxH) { hEmu = maxH; wEmu = Math.round(maxH / ratio); }
+          const inner = wDrawingParagraph(rId, docPrCounter++, wEmu, hEmu, 'center') +
+            wParagraph(`Фото ${ph.num}. ${ph.caption}`, { align: 'center', size: compact ? 15 : 17, before: 20, after: 15 });
+          return wCell(inner, 5103, { vAlign: 'top' });
+        }).join('');
+        phRowsXml += `<w:tr><w:trPr><w:cantSplit/></w:trPr>${cells}</w:tr>`;
+      }
+      body.push(wTable(phRowsXml, [5103, 5103], true));
+    }
+
+    const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+  xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+  <w:body>
+    ${body.join('\n')}
+    <w:sectPr>
+      <w:pgSz w:w="11906" w:h="16838"/>
+      <w:pgMar w:top="850" w:right="850" w:bottom="850" w:left="850" w:header="450" w:footer="450" w:gutter="0"/>
+    </w:sectPr>
+  </w:body>
+</w:document>`;
+
+    const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:docDefaults><w:rPrDefault><w:rPr>
+    <w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/>
+    <w:sz w:val="20"/><w:lang w:val="ru-RU"/>
+  </w:rPr></w:rPrDefault></w:docDefaults>
+</w:styles>`;
+
+    const contentTypesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Default Extension="jpg" ContentType="image/jpeg"/>
+  <Default Extension="png" ContentType="image/png"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+</Types>`;
+
+    const rootRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`;
+
+    const docRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  ${rels.join('\n  ')}
+</Relationships>`;
+
+    zipFiles.push(
+      { name: '[Content_Types].xml', data: utf8Bytes(contentTypesXml) },
+      { name: '_rels/.rels', data: utf8Bytes(rootRelsXml) },
+      { name: 'word/document.xml', data: utf8Bytes(documentXml) },
+      { name: 'word/styles.xml', data: utf8Bytes(stylesXml) },
+      { name: 'word/_rels/document.xml.rels', data: utf8Bytes(docRelsXml) }
+    );
+    return createZipBlob(zipFiles, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+  }
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1500);
+  }
+
+  /* ==================== PRINT / PDF RENDERER ==================== */
+  function buildPrintHtml(c) {
+    const photos = getAllOrderedPhotos(c);
+    const tireSum = formatTireSummary(c);
+    let photoRows = '';
+    for (let i = 0; i < photos.length; i += 2) {
+      const p1 = photos[i], p2 = photos[i + 1];
+      photoRows += `<tr>
+        <td>${p1 ? `<img src="${p1.dataUrl}"><div class="p-caption">Фото ${p1.num}. ${escapeHtml(p1.caption)}</div>` : ''}</td>
+        <td>${p2 ? `<img src="${p2.dataUrl}"><div class="p-caption">Фото ${p2.num}. ${escapeHtml(p2.caption)}</div>` : ''}</td>
+      </tr>`;
+    }
+    return `
+      ${state.profile.org ? `<div style="text-align:center;font-weight:bold">${escapeHtml(state.profile.org)}</div>` : ''}
+      <h1>Акт осмотра транспортного средства № ${escapeHtml(c.actNumber || '____')}</h1>
+      <div class="p-sub">(в соответствии с Положением Банка России от 04.03.2021 № 755-П)</div>
+      <table>
+        <tr><th>Дата и время</th><td>${formatDateRU(c.inspectDate)}, ${escapeHtml(c.inspectTime || '__:__')}</td><th>Дата ДТП</th><td>${formatDateRU(c.dtpDate)}</td></tr>
+        <tr><th>Место осмотра</th><td>${escapeHtml(c.address || '—')} ${c.gps ? `(GPS: ${escapeHtml(c.gps)})` : ''}</td><th>ОСАГО / СК</th><td>${escapeHtml(c.insurer || '—')} ${escapeHtml(c.policy || '')}</td></tr>
+        <tr><th>Эксперт-техник</th><td>${escapeHtml(state.profile.name || '—')} ${state.profile.mak ? `(МАК № ${escapeHtml(state.profile.mak)})` : ''}</td><th>Заказчик</th><td>${escapeHtml(c.ownerName || '—')} ${escapeHtml(c.ownerPhone || '')}</td></tr>
+        <tr><th>Условия осмотра</th><td colspan="3">Освещение: ${escapeHtml(c.lighting)}; Погода: ${escapeHtml(c.weather)}; Кузов: ${escapeHtml(c.cleanliness)}; Приборы: ${escapeHtml(c.ignition)}. Присутствовали: ${escapeHtml(c.presentPersons || '—')}.</td></tr>
+      </table>
+      <h2>1. Данные транспортного средства</h2>
+      <table>
+        <tr><th>Марка, модель</th><td>${escapeHtml(c.carModel || '—')}</td><th>Госномер</th><td>${escapeHtml(c.plate || '—')}</td></tr>
+        <tr><th>VIN / кузов</th><td>${escapeHtml(c.vin || '—')}</td><th>Год выпуска</th><td>${escapeHtml(c.year || '—')}</td></tr>
+        <tr><th>Пробег</th><td>${c.mileage ? escapeHtml(c.mileage) + ' км' : '—'}</td><th>Цвет</th><td>${escapeHtml(c.color || '—')}</td></tr>
+        <tr><th>СТС / ПТС</th><td>${escapeHtml(c.sts || '—')}</td><th>Кузов / состояние</th><td>${escapeHtml(c.bodyType || '—')} / ${escapeHtml(c.condition || '—')}</td></tr>
+        ${(c.equipment && c.equipment.length) ? `<tr><th>Комплектация</th><td colspan="3">${escapeHtml(c.equipment.join(', '))}</td></tr>` : ''}
+        ${tireSum ? `<tr><th>Шины и диски</th><td colspan="3">${escapeHtml(tireSum)}</td></tr>` : ''}
+      </table>
+      <h2>2. Выявленные повреждения, ЛКП и ремонтные воздействия</h2>
+      <table>
+        <tr><th style="width:5%">№</th><th style="width:23%">Деталь / узел</th><th style="width:41%">Описание и статус</th><th style="width:14%">ЛКП (мкм)</th><th style="width:17%">Коды</th></tr>
+        ${c.defects.length ? c.defects.map((d, i) => {
+          const rel = getRelMeta(d.relation);
+          const relNote = d.relation !== 'dtp' ? `<br><i><b>${escapeHtml(rel.docText)}</b></i>` : '';
+          return `<tr>
+            <td>${i + 1}</td>
+            <td><b>${escapeHtml(d.part)}</b></td>
+            <td>${escapeHtml([...(d.types || []), d.desc].filter(Boolean).join('. '))}${relNote}</td>
+            <td>${escapeHtml(d.lkp || '—')}</td>
+            <td><b>${escapeHtml((d.codes || []).join(', '))}</b></td>
+          </tr>`;
+        }).join('') : '<tr><td colspan="5">Повреждения не зафиксированы.</td></tr>'}
+      </table>
+      ${c.hiddenDamagesClause ? '<p><b>ВНИМАНИЕ:</b> Возможны скрытые повреждения, выявление которых возможно при разборке (дефектовке) ТС в условиях СТОА.</p>' : ''}
+      ${c.notes ? `<p><b>Особые отметки:</b> ${escapeHtml(c.notes)}</p>` : ''}
+      <table class="p-sig-table">
+        <tr>
+          <td>
+            <div><b>Эксперт-техник:</b></div>
+            ${c.sigExpert ? `<img class="p-sig-img" src="${c.sigExpert}">` : '<br><br>'}
+            <div>________________ / ${escapeHtml(state.profile.name || '________________')} /</div>
+          </td>
+          <td>
+            <div><b>Заказчик / собственник:</b></div>
+            ${c.sigClient ? `<img class="p-sig-img" src="${c.sigClient}">` : '<br><br>'}
+            <div>________________ / ${escapeHtml(c.ownerName || '________________')} /</div>
+          </td>
+        </tr>
+      </table>
+      ${photos.length ? `
+        <div class="p-pagebreak"></div>
+        <h1>Приложение № 1. Фототаблица к Акту № ${escapeHtml(c.actNumber || '____')}</h1>
+        <div class="p-sub">${escapeHtml(c.carModel || '')} • ${escapeHtml(c.plate || '')} • VIN: ${escapeHtml(c.vin || '')}</div>
+        <table class="p-photo-grid">${photoRows}</table>
+      ` : ''}
+    `;
+  }
+
+  /* ==================== DEMO DATA GENERATOR ==================== */
+  function makeSamplePhoto(title, accent, drawDemoArrow) {
+    const cv = document.createElement('canvas');
+    cv.width = 800; cv.height = 600;
+    const ctx = cv.getContext('2d');
+    const grad = ctx.createLinearGradient(0, 0, 800, 600);
+    grad.addColorStop(0, '#1e293b'); grad.addColorStop(1, accent || '#0f172a');
+    ctx.fillStyle = grad; ctx.fillRect(0, 0, 800, 600);
+    ctx.strokeStyle = 'rgba(255,255,255,0.22)'; ctx.lineWidth = 4;
+    ctx.strokeRect(24, 24, 752, 552);
+    ctx.fillStyle = '#f8fafc'; ctx.fillRect(140, 470, 520, 40);
+    ctx.fillStyle = '#0f172a';
+    for (let x = 150; x <= 650; x += 20) ctx.fillRect(x, 470, 2, (x - 150) % 100 === 0 ? 24 : 14);
+    ctx.font = 'bold 16px sans-serif';
+    ctx.fillText('0 см', 148, 505); ctx.fillText('25 см (ДЕМО-ЛИНЕЙКА)', 450, 505);
+    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 32px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('ДЕМО-СНИМОК 755-П v2.1', 400, 210);
+    ctx.fillStyle = '#93c5fd'; ctx.font = 'bold 24px sans-serif';
+    ctx.fillText(title, 400, 270);
+    ctx.fillStyle = '#fbbf24'; ctx.font = 'bold 19px sans-serif';
+    ctx.fillText(formatDateRU(todayISO()) + ' ' + nowTime() + ' | 55.7558, 37.6173', 400, 340);
+
+    if (drawDemoArrow) {
+      editor.drawShape(ctx, { tool: 'circle', color: '#facc15', lw: 7, x1: 280, y1: 160, x2: 520, y2: 310 });
+      editor.drawShape(ctx, { tool: 'arrow', color: '#ef4444', lw: 8, x1: 120, y1: 110, x2: 285, y2: 205 });
+    }
+    return { dataUrl: cv.toDataURL('image/jpeg', 0.82), width: 800, height: 600, ts: Date.now() };
+  }
+
+  function fillDemoCase() {
+    if (!state.profile.name) {
+      state.profile = {
+        name: 'Смирнов Алексей Викторович', mak: '7412',
+        phone: '+7 (926) 555-01-44', org: 'ИП Смирнов А.В. (Независимая автоэкспертиза)', city: 'г. Москва'
+      };
+    }
+    const c = createEmptyCase();
+    c.actNumber = '2026-DEMO-21';
+    c.dtpDate = todayISO();
+    c.address = 'г. Москва, ул. Ленинская Слобода, д. 19 (открытая парковка)';
+    c.gps = '55.7089, 37.6524';
+    c.carModel = 'Kia Rio IV';
+    c.plate = 'Е482КХ799';
+    c.vin = 'Z94C241BBLR123456';
+    c.year = '2021';
+    c.mileage = '68420';
+    c.color = 'Белый';
+    c.sts = '99 24 815290';
+    c.bodyType = 'Седан, АКПП';
+    c.equipment = ['LED / матричные фары', 'Парктроники', 'Камера заднего вида / 360°'];
+    c.tireBrand = 'Michelin Primacy 4';
+    c.tireSize = '195/55 R16';
+    c.tireSeason = 'Летние';
+    c.diskType = 'Легкосплавные (оригинал)';
+    c.treadFL = '5.5'; c.treadFR = '5.5'; c.treadRL = '6.0'; c.treadRR = '6.0';
+    c.ownerName = 'Соколов Дмитрий Сергеевич';
+    c.ownerPhone = '+7 (916) 222-33-44';
+    c.insurer = 'СПАО «Ингосстрах»';
+    c.policy = 'ХХХ 0294817263';
+    c.notes = 'Автомобиль представлен в чистом виде, замеры ЛКП проведены прибором Etari ET-600.';
+
+    MANDATORY_SLOTS.slice(0, 8).forEach((s, i) => {
+      const p = makeSamplePhoto(s.title, i % 2 === 0 ? '#1d4ed8' : '#0f766e', false);
+      c.mandatoryPhotos[s.id] = { id: uid(), ...p, caption: s.title };
+    });
+
+    c.defects = [
+      {
+        id: uid(), part: 'Бампер передний', relation: 'dtp', lkp: 'Пластик / н/д',
+        types: ['Разрыв / пролом', 'Царапина / притёртость'], codes: ['З', 'О', 'С/У', 'СКР'],
+        desc: 'Разрыв пластика в левой части 14×9 см, разрушение креплений, возможны скрытые повреждения абсорбера и усилителя.',
+        photos: [{ id: uid(), ...makeSamplePhoto('Бампер передний — разрыв (с разметкой)', '#991b1b', true), caption: '(к п. 1 Акта) Бампер передний — разрыв пластика с линейкой' }]
+      },
+      {
+        id: uid(), part: 'Крыло переднее левое', relation: 'dtp', lkp: 'Завод (115–130 мкм)',
+        types: ['Залом', 'Скол ЛКП'], codes: ['Р2', 'О', 'С/У'],
+        desc: 'Деформация с заломом ребра жёсткости по арке длиной 18 см, нарушение ЛКП до грунта.',
+        photos: [{ id: uid(), ...makeSamplePhoto('Крыло переднее левое — залом', '#9a3412', false), caption: '(к п. 2 Акта) Крыло переднее левое — залом по арке' }]
+      },
+      {
+        id: uid(), part: 'Крыло заднее правое', relation: 'old', lkp: 'Шпаклёвка (580–640 мкм)',
+        types: ['Царапина / притёртость'], codes: [],
+        desc: 'Следы коррозии по кромке арки, ранее ремонтировалась, к заявленному ДТП не относится.',
+        photos: []
+      }
+    ];
+
+    state.cases.unshift(c);
+    state.currentCaseId = c.id;
+    resetDefectDraft();
+    scheduleSave(true);
+    renderAll();
+    toast('Демо-дело v2.1 создано! Попробуйте нажать на фото для рисования стрелок.');
+  }
+
+  /* ==================== EVENT BINDINGS ==================== */
+  function bindEvents() {
+    // Bottom Navigation
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.tab;
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b === btn));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === target));
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        if (target === 'tab-export') {
+          renderAudit();
+          setTimeout(() => { sigPadExpert.resize(); sigPadClient.resize(); }, 50);
+        }
+      });
+    });
+
+    // Zone subtabs
+    document.querySelectorAll('.subtab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const zId = btn.dataset.zoneTab;
+        document.querySelectorAll('.subtab-btn').forEach(b => b.classList.toggle('active', b === btn));
+        document.querySelectorAll('.zone-panel').forEach(p => p.classList.toggle('active', p.id === zId));
+      });
+    });
+
+    // Profile inputs
+    ['name', 'mak', 'phone', 'org', 'city'].forEach(k => {
+      document.getElementById('prof-' + k).addEventListener('input', (e) => {
+        state.profile[k] = e.target.value;
+        scheduleSave(); renderAudit();
+      });
+    });
+
+    // Case card & tire inputs
+    document.querySelectorAll('[data-field]').forEach(el => {
+      const ev = el.tagName === 'SELECT' ? 'change' : 'input';
+      el.addEventListener(ev, () => {
+        const c = getCurrentCase();
+        const f = el.dataset.field;
+        let v = el.value;
+        if (f === 'vin' || f === 'plate') { v = v.toUpperCase(); el.value = v; }
+        c[f] = v;
+        if (f === 'vin') updateVinUI(v);
+        if (f === 'actNumber') document.getElementById('card-act-badge').textContent = `Акт № ${v || '—'}`;
+        renderHeader(); scheduleSave();
+      });
+    });
+
+    // GPS
+    document.getElementById('btn-gps').addEventListener('click', () => {
+      if (!navigator.geolocation) { toast('Геолокация недоступна в этом браузере'); return; }
+      toast('Определяю координаты...');
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const coords = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+          getCurrentCase().gps = coords;
+          document.getElementById('gps-badge').textContent = `GPS: ${coords}`;
+          scheduleSave(); toast('GPS сохранён: ' + coords);
+        },
+        () => toast('Нет доступа к GPS (в локальном data:/file: режиме GPS часто ограничен)'),
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    });
+
+    document.getElementById('chk-watermark').addEventListener('change', (e) => {
+      state.watermark = e.target.checked; scheduleSave();
+    });
+    document.getElementById('chk-hidden-damages').addEventListener('change', (e) => {
+      getCurrentCase().hiddenDamagesClause = e.target.checked; scheduleSave();
+    });
+    document.getElementById('sel-photo-layout').addEventListener('change', (e) => {
+      state.photoLayout = e.target.value; scheduleSave();
+    });
+
+    // Photo input handler
+    async function handleFileInput(files) {
+      if (!files || !files.length || !activePhotoTarget) return;
+      const c = getCurrentCase();
+      toast('Обработка фото...');
+      for (const file of Array.from(files)) {
+        try {
+          const processed = await processImageFile(file, state.watermark, c.gps);
+          if (activePhotoTarget.kind === 'slot') {
+            const slot = MANDATORY_SLOTS.find(s => s.id === activePhotoTarget.slotId);
+            c.mandatoryPhotos[activePhotoTarget.slotId] = { id: uid(), ...processed, caption: slot ? slot.title : 'Фото осмотра' };
+          } else if (activePhotoTarget.kind === 'extra') {
+            c.extraPhotos.push({ id: uid(), ...processed, caption: `Дополнительное фото ${c.extraPhotos.length + 1}` });
+          } else if (activePhotoTarget.kind === 'defectDraft') {
+            draftDefect.photos.push({ id: uid(), ...processed, caption: '' });
+          } else if (activePhotoTarget.kind === 'defectExisting') {
+            const def = c.defects.find(d => d.id === activePhotoTarget.defectId);
+            if (def) {
+              def.photos = def.photos || [];
+              def.photos.push({ id: uid(), ...processed, caption: `${def.part} — детальное фото` });
+            }
+          }
+        } catch (err) { toast('Не удалось прочитать изображение'); }
+      }
+      scheduleSave(true);
+      renderPhotos(); renderDefectBuilderChips(); renderDefects(); renderHeader(); renderAudit();
+      toast('Фото добавлено (нажмите на него для стрелок)');
+    }
+
+    document.getElementById('inp-camera').addEventListener('change', (e) => { handleFileInput(e.target.files); e.target.value = ''; });
+    document.getElementById('inp-gallery').addEventListener('change', (e) => { handleFileInput(e.target.files); e.target.value = ''; });
+
+    document.getElementById('btn-add-extra-photo').addEventListener('click', () => {
+      activePhotoTarget = { kind: 'extra' };
+      document.getElementById('inp-gallery').setAttribute('multiple', 'multiple');
+      document.getElementById('inp-gallery').click();
+    });
+
+    // Car SVG zone clicks
+    document.querySelectorAll('.car-zone').forEach(z => {
+      z.addEventListener('click', () => selectPartFromSchema(z.dataset.part));
+    });
+    document.getElementById('def-part').addEventListener('input', () => renderPartGrids());
+
+    // Voice dictation
+    document.getElementById('btn-voice').addEventListener('click', () => {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        toast('Используйте микрофон на клавиатуре смартфона');
+        document.getElementById('def-desc').focus();
+        return;
+      }
+      try {
+        const rec = new SR();
+        rec.lang = 'ru-RU'; rec.interimResults = false;
+        toast('Говорите описание повреждения...');
+        rec.onresult = (e) => {
+          const ta = document.getElementById('def-desc');
+          ta.value = (ta.value ? ta.value + ' ' : '') + e.results[0][0].transcript;
+        };
+        rec.onerror = () => toast('Диктовка недоступна офлайн — используйте микрофон клавиатуры');
+        rec.start();
+      } catch (e) { toast('Используйте микрофон клавиатуры смартфона'); }
+    });
+
+    document.getElementById('btn-def-cam').addEventListener('click', () => {
+      activePhotoTarget = { kind: 'defectDraft' };
+      document.getElementById('inp-camera').click();
+    });
+    document.getElementById('btn-def-gal').addEventListener('click', () => {
+      activePhotoTarget = { kind: 'defectDraft' };
+      document.getElementById('inp-gallery').setAttribute('multiple', 'multiple');
+      document.getElementById('inp-gallery').click();
+    });
+    document.getElementById('btn-cancel-edit').addEventListener('click', () => {
+      resetDefectDraft();
+      toast('Редактирование отменено');
+    });
+
+    document.getElementById('btn-add-defect').addEventListener('click', () => {
+      const part = document.getElementById('def-part').value.trim();
+      const lkp = document.getElementById('def-lkp').value.trim();
+      const desc = document.getElementById('def-desc').value.trim();
+      if (!part) { toast('Укажите деталь или выберите её на схеме'); return; }
+
+      const c = getCurrentCase();
+      const codeStr = draftDefect.codes.length ? ` (${draftDefect.codes.join(', ')})` : '';
+      const photosWithCaps = draftDefect.photos.map(p => ({
+        ...p,
+        caption: p.caption || `${part}${draftDefect.types.length ? ' — ' + draftDefect.types.join(', ').toLowerCase() : ''}${codeStr}`
+      }));
+
+      const record = {
+        id: draftDefect.editingId || uid(),
+        part,
+        relation: draftDefect.relation || 'dtp',
+        lkp,
+        types: [...draftDefect.types],
+        codes: [...draftDefect.codes],
+        desc,
+        photos: photosWithCaps
+      };
+
+      if (draftDefect.editingId) {
+        const idx = c.defects.findIndex(x => x.id === draftDefect.editingId);
+        if (idx >= 0) c.defects[idx] = record;
+        else c.defects.push(record);
+        toast('Повреждение обновлено');
+      } else {
+        c.defects.push(record);
+        toast('Повреждение добавлено в Акт');
+      }
+
+      resetDefectDraft();
+      scheduleSave(true);
+      renderDefects(); renderHeader(); renderAudit();
+    });
+
+    // Photo Editor Toolbar
+    document.querySelectorAll('[data-tool]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        editor.tool = btn.dataset.tool;
+        document.querySelectorAll('[data-tool]').forEach(b => b.classList.toggle('active', b === btn));
+      });
+    });
+    document.querySelectorAll('[data-color]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        editor.color = btn.dataset.color;
+        document.querySelectorAll('[data-color]').forEach(b => b.classList.toggle('active', b === btn));
+      });
+    });
+    document.getElementById('ed-undo').addEventListener('click', () => editor.undo());
+    document.getElementById('ed-reset').addEventListener('click', () => editor.reset());
+
+    // Modal controls
+    document.getElementById('modal-close').addEventListener('click', closePhotoModal);
+    document.getElementById('photo-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'photo-modal') closePhotoModal();
+    });
+    document.getElementById('modal-save').addEventListener('click', () => {
+      if (!modalPhotoRef) return;
+      modalPhotoRef.photo.caption = document.getElementById('modal-caption').value.trim();
+      if (editor.dirty) {
+        modalPhotoRef.photo.dataUrl = editor.exportDataUrl();
+      }
+      if (modalPhotoRef.kind !== 'defectDraft') scheduleSave(true);
+      renderPhotos(); renderDefectBuilderChips(); renderDefects();
+      closePhotoModal();
+      toast(editor.dirty ? 'Разметка и подпись сохранены' : 'Подпись обновлена');
+    });
+    document.getElementById('modal-delete').addEventListener('click', () => {
+      if (!modalPhotoRef) return;
+      const c = getCurrentCase();
+      if (modalPhotoRef.kind === 'slot') delete c.mandatoryPhotos[modalPhotoRef.slotId];
+      else if (modalPhotoRef.kind === 'extra') c.extraPhotos = c.extraPhotos.filter(x => x.id !== modalPhotoRef.id);
+      else if (modalPhotoRef.kind === 'defect') {
+        const d = c.defects.find(x => x.id === modalPhotoRef.defectId);
+        if (d) d.photos = (d.photos || []).filter(p => p.id !== modalPhotoRef.id);
+      } else if (modalPhotoRef.kind === 'defectDraft') {
+        draftDefect.photos.splice(modalPhotoRef.idx, 1);
+      }
+      if (modalPhotoRef.kind !== 'defectDraft') scheduleSave(true);
+      renderPhotos(); renderDefectBuilderChips(); renderDefects(); renderHeader(); renderAudit();
+      closePhotoModal();
+      toast('Фото удалено');
+    });
+
+    // Signatures clear
+    document.getElementById('btn-clear-sig-exp').addEventListener('click', () => sigPadExpert.clear());
+    document.getElementById('btn-clear-sig-cli').addEventListener('click', () => sigPadClient.clear());
+
+    // New / Demo / Delete case
+    document.getElementById('btn-new-case').addEventListener('click', () => {
+      resetDefectDraft();
+      const c = createEmptyCase();
+      state.cases.unshift(c); state.currentCaseId = c.id;
+      scheduleSave(true); renderAll();
+      document.querySelector('[data-tab="tab-card"]').click();
+      toast('Создан новый осмотр № ' + c.actNumber);
+    });
+    document.getElementById('btn-demo-case').addEventListener('click', fillDemoCase);
+    document.getElementById('btn-delete-case').addEventListener('click', () => {
+      if (!confirm('Удалить текущее дело безвозвратно?')) return;
+      const curId = state.currentCaseId;
+      state.cases = state.cases.filter(x => x.id !== curId);
+      state.currentCaseId = state.cases[0]?.id || null;
+      getCurrentCase(); resetDefectDraft();
+      scheduleSave(true); renderAll(); toast('Дело удалено');
+    });
+
+    // Export DOCX
+    document.getElementById('btn-export-docx').addEventListener('click', () => {
+      try {
+        const c = getCurrentCase();
+        toast('Собираю Word (.docx)...');
+        const blob = buildDocxBlob(c);
+        const safeName = (`Akt_${c.actNumber || 'osmotr'}_${c.plate || ''}`).replace(/[^a-zA-Z0-9а-яА-ЯёЁ_-]/g, '_');
+        downloadBlob(blob, `${safeName}.docx`);
+        toast('Готово! Файл .docx скачан');
+      } catch (err) {
+        console.error(err);
+        toast('Ошибка сборки .docx: ' + err.message);
+      }
+    });
+
+    // Print / Save PDF
+    document.getElementById('btn-export-print').addEventListener('click', () => {
+      document.getElementById('print-area').innerHTML = buildPrintHtml(getCurrentCase());
+      setTimeout(() => window.print(), 150);
+    });
+
+    // Backup / Restore single case
+    document.getElementById('btn-backup-case').addEventListener('click', () => {
+      const c = getCurrentCase();
+      const payload = { format: 'osmotr-755p-case-v2.1', exportedAt: new Date().toISOString(), profile: state.profile, caseData: c };
+      const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+      const safeName = (`Delo_${c.actNumber || 'backup'}_${c.plate || ''}`).replace(/[^a-zA-Z0-9а-яА-ЯёЁ_-]/g, '_');
+      downloadBlob(blob, `${safeName}.json`);
+      toast('Резервная копия дела сохранена (.json)');
+    });
+
+    document.getElementById('btn-import-case').addEventListener('click', () => document.getElementById('inp-import-json').click());
+    document.getElementById('inp-import-json').addEventListener('change', (e) => {
+      const file = e.target.files[0]; e.target.value = '';
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          if (parsed.caseData) {
+            const imp = normalizeCase({ ...parsed.caseData, id: uid() });
+            state.cases.unshift(imp); state.currentCaseId = imp.id;
+            if (parsed.profile && !state.profile.name) state.profile = parsed.profile;
+            resetDefectDraft(); scheduleSave(true); renderAll();
+            toast('Дело загружено из файла!');
+          } else if (Array.isArray(parsed.cases)) {
+            const normalized = parsed.cases.map(x => normalizeCase(x));
+            state.cases = [...normalized, ...state.cases];
+            state.currentCaseId = state.cases[0]?.id || null;
+            resetDefectDraft(); scheduleSave(true); renderAll();
+            toast(`Импортировано дел: ${normalized.length}`);
+          } else toast('Неизвестный формат файла');
+        } catch (err) { toast('Ошибка чтения JSON-файла'); }
+      };
+      reader.readAsText(file);
+    });
+
+    // Backup / Restore all cases
+    document.getElementById('btn-export-all').addEventListener('click', () => {
+      const payload = { format: 'osmotr-755p-full-backup-v2.1', exportedAt: new Date().toISOString(), profile: state.profile, cases: state.cases };
+      const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+      downloadBlob(blob, `Osmotr755_AllBackup_${todayISO()}.json`);
+      toast(`Сохранено дел: ${state.cases.length}`);
+    });
+
+    document.getElementById('btn-import-all').addEventListener('click', () => document.getElementById('inp-import-all').click());
+    document.getElementById('inp-import-all').addEventListener('change', (e) => {
+      const file = e.target.files[0]; e.target.value = '';
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          if (Array.isArray(parsed.cases)) {
+            if (parsed.profile) state.profile = parsed.profile;
+            state.cases = parsed.cases.map(x => normalizeCase(x));
+            state.currentCaseId = state.cases[0]?.id || null;
+            resetDefectDraft(); scheduleSave(true); renderAll();
+            toast(`Восстановлено дел: ${state.cases.length}`);
+          } else if (parsed.caseData) {
+            state.cases.unshift(normalizeCase({ ...parsed.caseData, id: uid() }));
+            state.currentCaseId = state.cases[0].id;
+            resetDefectDraft(); scheduleSave(true); renderAll();
+            toast('Дело добавлено из файла');
+          } else toast('Файл не похож на резервную копию');
+        } catch (err) { toast('Ошибка чтения файла бэкапа'); }
+      };
+      reader.readAsText(file);
+    });
+  }
+
+  /* ==================== INIT ==================== */
+  async function init() {
+    await openDB();
+    const saved = await storageGet('app_state_v2');
+    if (saved && Array.isArray(saved.cases)) {
+      state = { ...state, ...saved, cases: saved.cases.map(x => normalizeCase(x)) };
+    }
+    getCurrentCase();
+    editor.init();
+    sigPadExpert = initSignaturePad('sig-expert', 'sigExpert');
+    sigPadClient = initSignaturePad('sig-client', 'sigClient');
+    bindEvents();
+    renderAll();
+    document.getElementById('save-status').textContent = useLocalStorageFallback ? 'v2.1 (LS)' : 'v2.1 офлайн';
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
